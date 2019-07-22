@@ -8,6 +8,7 @@
 
 import UIKit
 import ErrorHandler
+import RxSwift
 
 enum CustomError: Error {
     case noInternet
@@ -28,6 +29,8 @@ fileprivate extension Error {
 
 class ViewController: UIViewController {
     
+    private let disposeBag = DisposeBag()
+    
     private lazy var errorHandler = ErrorHandler.default(for: self)
         .on(.error(CustomError.authenticate), do: .custom(startAuthentication))
         .on(.match({ $0 is RandomError }), do: .custom({ onHandled in print("win"); onHandled?(); return true }))
@@ -42,7 +45,13 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        errorHandler.handle(error: RandomError.two, onHandled: { print("finished!") })
+        Observable<String>.error(RandomError.two)
+            .subscribe(onNext: { result in
+                print("Success: " + result)
+            }, onError: errorHandler.handle)
+            .disposed(by: disposeBag)
+        
+//        errorHandler.handle(error: RandomError.two, onHandled: { print("finished!") })
 //        errorHandler.handle(error: CustomError.authenticate)
     }
 

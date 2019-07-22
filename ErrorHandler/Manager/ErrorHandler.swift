@@ -53,7 +53,7 @@ open class ErrorHandler {
     ///
     /// - Parameter error: The error that should be handled
     /// - Parameter onHandled: The optional block that gets executed after the error has been handled successfully
-    public func handle(error: Error, onHandled: OnErrorHandled = nil) {
+    public func handle(error: Error, onHandled: OnErrorHandled) {
         
         var handled = false
         
@@ -71,5 +71,14 @@ open class ErrorHandler {
         if !handled {
             print("unhandled error: \(error.localizedDescription)")
         }
+    }
+    
+    /// This convenience function is called to handle an error
+    /// The main reason for this function is to handle RxSwift errors inline
+    /// Example: subscribe(onError: errorHandler.handle)
+    ///
+    /// - Parameter error: The error that should be handled
+    public func handle(error: Error) {
+        handle(error: error, onHandled: nil)
     }
 }
