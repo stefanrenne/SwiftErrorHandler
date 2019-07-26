@@ -9,26 +9,72 @@
 import XCTest
 @testable import ErrorHandler
 
+fileprivate enum HandlerError1: Error {
+    case error1
+    case error2
+    case error3
+}
+
+fileprivate enum HandlerError2: Error {
+    case error4
+}
+
 class ErrorHandlerTests: XCTestCase {
-
-    override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    
+    func testItCanHandleSpecificErrors() throws {
+        let view = MockedView(numberExpectedResults: 2)
+        let handler = ErrorHandler(for: view)
+            .on(.error(HandlerError1.error1), do: .custom(view.customHandler))
+        
+        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: view.onHandled))
+        
+        XCTAssertTrue(view.didHandleResult())
     }
-
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    
+    func testItCantHandleSpecificErrorsWhereThereAreNoSpecificHandlers() throws {
+        let view = MockedView(numberExpectedResults: 2)
+        let handler = ErrorHandler(for: view)
+            .on(.error(HandlerError1.error1), do: .custom(view.customHandler))
+        
+        XCTAssertFalse(handler.handle(error: HandlerError1.error2, onHandled: view.onHandled))
+        
+        XCTAssertFalse(view.didHandleResult())
     }
-
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    
+    func testItCanFallbackToADefaultHandler() throws {
+        let view = MockedView(numberExpectedResults: 2)
+        let handler = ErrorHandler(for: view)
+            .on(.error(HandlerError1.error1), do: .custom({ _ in XCTFail("Unexpected Handler Executed"); return false }))
+            .else(do: .custom(view.customHandler))
+        
+        XCTAssertTrue(handler.handle(error: HandlerError1.error2, onHandled: view.onHandled))
+        
+        XCTAssertTrue(view.didHandleResult())
     }
-
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
+    
+    func testItPrefersASpecficHandlerAboveTheDefaultHandler() throws {
+        let view = MockedView(numberExpectedResults: 2)
+        let handler = ErrorHandler(for: view)
+            .on(.error(HandlerError1.error1), do: .custom(view.customHandler))
+            .else(do: .custom({ _ in XCTFail("Unexpected Handler Executed"); return false }))
+        
+        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: view.onHandled))
+        
+        XCTAssertTrue(view.didHandleResult())
     }
+    
+    func testItPrefersTheFirstMatchedHandler() throws {
+        let view = MockedView(numberExpectedResults: 2)
+        let handler = ErrorHandler(for: view)
+            .on(.error(HandlerError1.error1), do: .custom(view.customHandler))
+            .on(.error(HandlerError1.error1), do: .custom({ _ in XCTFail("Unexpected Handler Executed"); return false }))
+            .else(do: .custom({ _ in XCTFail("Unexpected Handler Executed"); return false }))
+        
+        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: view.onHandled))
+        
+        XCTAssertTrue(view.didHandleResult())
+        
+    }
+    
 
 }

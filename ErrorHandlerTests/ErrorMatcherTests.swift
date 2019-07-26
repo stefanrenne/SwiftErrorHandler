@@ -9,14 +9,14 @@
 import XCTest
 @testable import ErrorHandler
 
-fileprivate enum TestError1: Error {
-    case randomError1
-    case randomError2
-    case randomError3
+fileprivate enum MatcherError1: Error {
+    case error1
+    case error2
+    case error3
 }
 
-fileprivate enum TestError2: Error {
-    case randomError4
+fileprivate enum MatcherError2: Error {
+    case error4
 }
 
 class ErrorMatcherTests: XCTestCase {
@@ -24,17 +24,17 @@ class ErrorMatcherTests: XCTestCase {
     func testItCanMatchError() throws {
         
         let matchers: [(ErrorMatcher, ActionHandler)] = [
-            (ErrorMatcher.error(TestError1.randomError2), ActionHandler.custom({ _ in return false })),
-            (ErrorMatcher.error(TestError2.randomError4), ActionHandler.custom({ _ in return false })),
-            (ErrorMatcher.error(TestError1.randomError1), ActionHandler.custom({ _ in return true }))
+            (ErrorMatcher.error(MatcherError1.error2), ActionHandler.custom({ _ in return false })),
+            (ErrorMatcher.error(MatcherError2.error4), ActionHandler.custom({ _ in return false })),
+            (ErrorMatcher.error(MatcherError1.error1), ActionHandler.custom({ _ in return true }))
         ]
         
-        let searchError = TestError1.randomError1
+        let searchError = MatcherError1.error1
         
         // Find the validator for this error
         guard let actionHandler = matchers.firstAction(for: searchError),
             case ActionHandler.custom(let handler) = actionHandler else {
-            XCTFail("Couldn't find action handler for TestError1.randomError1")
+            XCTFail("Couldn't find action handler for MatcherError1.error1")
             return
         }
         
@@ -45,11 +45,11 @@ class ErrorMatcherTests: XCTestCase {
     func testItCanMatchErrorCodes() throws {
         
         let matchers: [(ErrorMatcher, ActionHandler)] = [
-            (ErrorMatcher.error(TestError1.randomError2), ActionHandler.custom({ _ in return false })),
-            (ErrorMatcher.error(TestError2.randomError4), ActionHandler.custom({ _ in return false })),
+            (ErrorMatcher.error(MatcherError1.error2), ActionHandler.custom({ _ in return false })),
+            (ErrorMatcher.error(MatcherError2.error4), ActionHandler.custom({ _ in return false })),
             (ErrorMatcher.code(404), .custom({ _ in return false })),
             (ErrorMatcher.code(400), .custom({ _ in return true })),
-            (ErrorMatcher.error(TestError1.randomError1), ActionHandler.custom({ _ in return false }))
+            (ErrorMatcher.error(MatcherError1.error1), ActionHandler.custom({ _ in return false }))
         ]
         
         let searchError = NSError(domain: "damain", code: 400, userInfo: ["data": "value"])
@@ -69,20 +69,20 @@ class ErrorMatcherTests: XCTestCase {
     func testItCanMatchWithBlock() throws {
         
         let matchers: [(ErrorMatcher, ActionHandler)] = [
-            (ErrorMatcher.error(TestError1.randomError2), ActionHandler.custom({ _ in return false })),
+            (ErrorMatcher.error(MatcherError1.error2), ActionHandler.custom({ _ in return false })),
             (ErrorMatcher.code(404), .custom({ _ in return false })),
             (ErrorMatcher.match({ error in
-                guard let testError = error as? TestError1, testError == .randomError3 else { return true }
+                guard let testError = error as? MatcherError1, testError == .error3 else { return true }
                 return true
             }), ActionHandler.custom({ _ in return true })),
         ]
         
-        let searchError = TestError1.randomError3
+        let searchError = MatcherError1.error3
         
         // Find the validator for this error
         guard let actionHandler = matchers.firstAction(for: searchError),
             case ActionHandler.custom(let handler) = actionHandler else {
-                XCTFail("Couldn't find action handler for TestError1.randomError3")
+                XCTFail("Couldn't find action handler for MatcherError1.error3")
                 return
         }
         
@@ -94,15 +94,15 @@ class ErrorMatcherTests: XCTestCase {
     func testItCanMatchCompleteErrorSuites() throws {
         
         let matchers: [(ErrorMatcher, ActionHandler)] = [
-            (ErrorMatcher.match({ $0 is TestError2 }), ActionHandler.custom({ _ in return true })),
+            (ErrorMatcher.match({ $0 is MatcherError2 }), ActionHandler.custom({ _ in return true })),
         ]
         
-        let searchError = TestError2.randomError4
+        let searchError = MatcherError2.error4
         
         // Find the validator for this error
         guard let actionHandler = matchers.firstAction(for: searchError),
             case ActionHandler.custom(let handler) = actionHandler else {
-                XCTFail("Couldn't find action handler for TestError2")
+                XCTFail("Couldn't find action handler for MatcherError2")
                 return
         }
         

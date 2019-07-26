@@ -29,6 +29,9 @@
 		F854456922E1EF1B00DE0761 /* ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = F854456822E1EF1B00DE0761 /* ErrorAlert.swift */; };
 		F854456B22E1F5B100DE0761 /* RejectableAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = F854456A22E1F5B100DE0761 /* RejectableAlert.swift */; };
 		F86381DE22EAF39A00A035BE /* DispatchGroup+Enter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F86381DD22EAF39A00A035BE /* DispatchGroup+Enter.swift */; };
+		F86381E222EAF7D800A035BE /* ErrorHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F86381E122EAF7D800A035BE /* ErrorHandlerTests.swift */; };
+		F86381E422EAF88D00A035BE /* MockedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F86381E322EAF88D00A035BE /* MockedView.swift */; };
+		F86381E622EAF8A400A035BE /* MockedAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = F86381E522EAF8A400A035BE /* MockedAlert.swift */; };
 		F86ECD6422E2003800DB4488 /* ErrorMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F86ECD6322E2003800DB4488 /* ErrorMatcher.swift */; };
 /* End PBXBuildFile section */
 
@@ -102,6 +105,9 @@
 		F854456822E1EF1B00DE0761 /* ErrorAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorAlert.swift; sourceTree = "<group>"; };
 		F854456A22E1F5B100DE0761 /* RejectableAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RejectableAlert.swift; sourceTree = "<group>"; };
 		F86381DD22EAF39A00A035BE /* DispatchGroup+Enter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DispatchGroup+Enter.swift"; sourceTree = "<group>"; };
+		F86381E122EAF7D800A035BE /* ErrorHandlerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorHandlerTests.swift; sourceTree = "<group>"; };
+		F86381E322EAF88D00A035BE /* MockedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedView.swift; sourceTree = "<group>"; };
+		F86381E522EAF8A400A035BE /* MockedAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockedAlert.swift; sourceTree = "<group>"; };
 		F86ECD6322E2003800DB4488 /* ErrorMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorMatcher.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -222,6 +228,7 @@
 				F854454422E1ECAB00DE0761 /* Info.plist */,
 				F84EE03922E5953A007049BF /* ErrorMatcherTests.swift */,
 				F84EE03C22E59C28007049BF /* ActionHandlerTests.swift */,
+				F86381E122EAF7D800A035BE /* ErrorHandlerTests.swift */,
 			);
 			path = ErrorHandlerTests;
 			sourceTree = "<group>";
@@ -265,6 +272,8 @@
 			isa = PBXGroup;
 			children = (
 				F86381DD22EAF39A00A035BE /* DispatchGroup+Enter.swift */,
+				F86381E322EAF88D00A035BE /* MockedView.swift */,
+				F86381E522EAF8A400A035BE /* MockedAlert.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -533,6 +542,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				F84EE03D22E59C28007049BF /* ActionHandlerTests.swift in Sources */,
+				F86381E222EAF7D800A035BE /* ErrorHandlerTests.swift in Sources */,
+				F86381E422EAF88D00A035BE /* MockedView.swift in Sources */,
+				F86381E622EAF8A400A035BE /* MockedAlert.swift in Sources */,
 				F86381DE22EAF39A00A035BE /* DispatchGroup+Enter.swift in Sources */,
 				F84EE03A22E5953A007049BF /* ErrorMatcherTests.swift in Sources */,
 			);

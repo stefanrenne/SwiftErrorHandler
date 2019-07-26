@@ -23,7 +23,7 @@ public struct ConfirmableAlert: ErrorAlert {
     
     public func build(onHandled: OnErrorHandled) -> UIAlertController {
         let controller = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let confirmButton = UIAlertAction(title: confirmTitle, style: .cancel) { _ in
+        let confirmButton = UIAlertAction(title: confirmTitle, style: .default) { _ in
             self.confirmAction?()
             onHandled?()
         }

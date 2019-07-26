@@ -9,72 +9,81 @@
 import XCTest
 @testable import ErrorHandler
 
-fileprivate class TestErrorHandlerView: ErrorHandlerView {
-    
-    let group: DispatchGroup
-    var lastResult: UIViewController?
-    
-    init(numberExpectedResults: Int) {
-        group = DispatchGroup.enter(number: numberExpectedResults)
-    }
-    
-    func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)?) {
-        lastResult = viewControllerToPresent
-        group.leave()
-        completion?()
-    }
-    
-    func onHandled() {
-        group.leave()
-    }
-    
-    func waitForResult() -> DispatchTimeoutResult {
-        return group.wait(timeout: .now() + .milliseconds(200))
-    }
-}
-
-fileprivate class TestAlert: ErrorAlert {
-    func build(onHandled: OnErrorHandled) -> UIAlertController {
-        let controller = UIAlertController(title: "title", message: "message", preferredStyle: .alert)
-        controller.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: nil))
-        return controller
-    }
-}
-
 class ActionHandlerTests: XCTestCase {
     
     func testItCanHandleTheEmptyAction() throws {
-        let testView = TestErrorHandlerView(numberExpectedResults: 1)
+        let view = MockedView(numberExpectedResults: 1)
         
-        XCTAssertTrue(ActionHandler.none.perform(on: testView, onHandled: testView.onHandled))
+        XCTAssertTrue(ActionHandler.none.perform(on: view, onHandled: view.onHandled))
         
-        XCTAssertTrue(testView.waitForResult() == .success)
+        XCTAssertTrue(view.didHandleResult())
     }
     
     func testItCanHandleTheAlertAction() throws {
-        let testView = TestErrorHandlerView(numberExpectedResults: 1)
-        let testAlert = TestAlert()
+        let view = MockedView(numberExpectedResults: 1)
+        let alert = MockedAlert()
 
-        XCTAssertTrue(ActionHandler.alert(testAlert).perform(on: testView, onHandled: nil))
+        XCTAssertTrue(ActionHandler.alert(alert).perform(on: view, onHandled: nil))
         
-        XCTAssertTrue(testView.waitForResult() == .success)
-
-        XCTAssertEqual((testView.lastResult as? UIAlertController)?.title, "title")
-        XCTAssertEqual((testView.lastResult as? UIAlertController)?.message, "message")
-        XCTAssertEqual((testView.lastResult as? UIAlertController)?.actions.count, 1)
+        XCTAssertTrue(view.didHandleResult())
+        
+        let alertController = view.lastResult as? UIAlertController
+        XCTAssertEqual(alertController?.title, "title")
+        XCTAssertEqual(alertController?.message, "message")
+        XCTAssertEqual(alertController?.actions.count, 1)
+        XCTAssertEqual(alertController?.actions[0].title, "cancel")
+        XCTAssertEqual(alertController?.actions[0].style, .cancel)
+        XCTAssertEqual(alertController?.actions[0].isEnabled, true)
+    }
+    
+    func testItCanHandleAConfirmableAlertAction() throws {
+        let view = MockedView(numberExpectedResults: 1)
+        let alert = ConfirmableAlert(title: "title", message: "message", confirmTitle: "confirm", confirmAction: nil)
+        
+        XCTAssertTrue(ActionHandler.alert(alert).perform(on: view, onHandled: nil))
+        
+        XCTAssertTrue(view.didHandleResult())
+        
+        let alertController = view.lastResult as? UIAlertController
+        XCTAssertEqual(alertController?.title, "title")
+        XCTAssertEqual(alertController?.message, "message")
+        XCTAssertEqual(alertController?.actions.count, 1)
+        XCTAssertEqual(alertController?.actions[0].title, "confirm")
+        XCTAssertEqual(alertController?.actions[0].style, .default)
+        XCTAssertEqual(alertController?.actions[0].isEnabled, true)
+    }
+    
+    func testItCanHandleARejectableAlertAction() throws {
+        let view = MockedView(numberExpectedResults: 1)
+        let alert = RejectableAlert(title: "title", message: "message", confirmTitle: "YES", confirmAction: nil, rejectTitle: "NO", rejectAction: nil)
+        
+        XCTAssertTrue(ActionHandler.alert(alert).perform(on: view, onHandled: nil))
+        
+        XCTAssertTrue(view.didHandleResult())
+        
+        let alertController = view.lastResult as? UIAlertController
+        XCTAssertEqual(alertController?.title, "title")
+        XCTAssertEqual(alertController?.message, "message")
+        XCTAssertEqual(alertController?.actions.count, 2)
+        XCTAssertEqual(alertController?.actions[0].title, "YES")
+        XCTAssertEqual(alertController?.actions[0].style, .default)
+        XCTAssertEqual(alertController?.actions[0].isEnabled, true)
+        XCTAssertEqual(alertController?.actions[1].title, "NO")
+        XCTAssertEqual(alertController?.actions[1].style, .cancel)
+        XCTAssertEqual(alertController?.actions[1].isEnabled, true)
     }
 
     func testItCanHandleTheCustomAction() throws {
-        let testView = TestErrorHandlerView(numberExpectedResults: 2)
+        let view = MockedView(numberExpectedResults: 2)
         
         let didHandleAction = ActionHandler.custom({ onHandled in
-            testView.group.leave()
+            view.group.leave()
             onHandled?()
             return true
-        }).perform(on: testView, onHandled: testView.onHandled)
+        }).perform(on: view, onHandled: view.onHandled)
         XCTAssertTrue(didHandleAction)
         
-        XCTAssertTrue(testView.waitForResult() == .success)
+        XCTAssertTrue(view.didHandleResult())
     }
     
 }

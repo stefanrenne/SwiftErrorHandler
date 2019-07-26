@@ -53,7 +53,9 @@ open class ErrorHandler {
     ///
     /// - Parameter error: The error that should be handled
     /// - Parameter onHandled: The optional block that gets executed after the error has been handled successfully
-    public func handle(error: Error, onHandled: OnErrorHandled) {
+    /// - Returns: an boolean inidication if the error was handled successfully
+    @discardableResult
+    public func handle(error: Error, onHandled: OnErrorHandled) -> Bool {
         
         var handled = false
         
@@ -71,6 +73,8 @@ open class ErrorHandler {
         if !handled {
             print("unhandled error: \(error.localizedDescription)")
         }
+        
+        return handled
     }
     
     /// This convenience function is called to handle an error
