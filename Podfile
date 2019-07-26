@@ -18,8 +18,6 @@ target 'ErrorHandler' do
 
     inherit! :search_paths
 
-    pod 'RxBlocking', '~> 5'
-
   end
 
 end
