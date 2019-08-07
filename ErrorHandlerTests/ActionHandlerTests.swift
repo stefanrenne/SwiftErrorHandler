@@ -9,12 +9,17 @@
 import XCTest
 @testable import ErrorHandler
 
+fileprivate enum SimpleError: Error {
+    case error1
+}
+
+
 class ActionHandlerTests: XCTestCase {
     
     func testItCanHandleTheEmptyAction() throws {
         let view = MockedView(numberExpectedResults: 1)
         
-        XCTAssertTrue(ActionHandler.none.perform(on: view, onHandled: view.onHandled))
+        XCTAssertTrue(ActionHandler.doNothing.perform(on: view, for: SimpleError.error1, onHandled: view.onHandled))
         
         XCTAssertTrue(view.didHandleResult())
     }
@@ -23,7 +28,7 @@ class ActionHandlerTests: XCTestCase {
         let view = MockedView(numberExpectedResults: 1)
         let alert = MockedAlert()
 
-        XCTAssertTrue(ActionHandler.alert(alert).perform(on: view, onHandled: nil))
+        XCTAssertTrue(ActionHandler.present(alert: alert).perform(on: view, for: SimpleError.error1, onHandled: nil))
         
         XCTAssertTrue(view.didHandleResult())
         
@@ -40,7 +45,7 @@ class ActionHandlerTests: XCTestCase {
         let view = MockedView(numberExpectedResults: 1)
         let alert = ConfirmableAlert(title: "title", message: "message", confirmTitle: "confirm", confirmAction: nil)
         
-        XCTAssertTrue(ActionHandler.alert(alert).perform(on: view, onHandled: nil))
+        XCTAssertTrue(ActionHandler.present(alert: alert).perform(on: view, for: SimpleError.error1, onHandled: nil))
         
         XCTAssertTrue(view.didHandleResult())
         
@@ -55,9 +60,9 @@ class ActionHandlerTests: XCTestCase {
     
     func testItCanHandleARejectableAlertAction() throws {
         let view = MockedView(numberExpectedResults: 1)
-        let alert = RejectableAlert(title: "title", message: "message", confirmTitle: "YES", confirmAction: nil, rejectTitle: "NO", rejectAction: nil)
+        let alert = RejectableAlert(title: "title", message: "message", confirmTitle: "YES", rejectTitle: "NO", confirmAction: nil, rejectAction: nil)
         
-        XCTAssertTrue(ActionHandler.alert(alert).perform(on: view, onHandled: nil))
+        XCTAssertTrue(ActionHandler.present(alert: alert).perform(on: view, for: SimpleError.error1, onHandled: nil))
         
         XCTAssertTrue(view.didHandleResult())
         
@@ -76,11 +81,11 @@ class ActionHandlerTests: XCTestCase {
     func testItCanHandleTheCustomAction() throws {
         let view = MockedView(numberExpectedResults: 2)
         
-        let didHandleAction = ActionHandler.custom({ onHandled in
+        let didHandleAction = ActionHandler.perform(action: { _, onHandled in
             view.group.leave()
             onHandled?()
             return true
-        }).perform(on: view, onHandled: view.onHandled)
+        }).perform(on: view, for: SimpleError.error1, onHandled: view.onHandled)
         XCTAssertTrue(didHandleAction)
         
         XCTAssertTrue(view.didHandleResult())

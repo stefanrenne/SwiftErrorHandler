@@ -23,13 +23,11 @@ open class ErrorHandler {
     /// adds an error handler for a specific error to the ErrorHandler
     ///
     /// - Parameters:
-    ///   - errorCode: The error to handle
-    ///   - handler: a closure containing the error, which will be called when an error with this specific
-    ///              error code occurs. the closure should return a bool whether or not it consumes the error
-    ///              If an error is not consumed, it will be handled by the defaultHandler as well
+    ///   - error: The error matcher
+    ///   - then action: The action that needs to be performed when the error matches
     /// - Returns: an instance of self (for chaining purposes)
     @discardableResult
-    public func on(_ errors: ErrorMatcher..., do action: ActionHandler) -> ErrorHandler {
+    public func `if`(error errors: ErrorMatcher..., then action: ActionHandler) -> ErrorHandler {
         errors.forEach { (error) in
             self.specificErrorActions.append((error, action))
         }
@@ -39,12 +37,10 @@ open class ErrorHandler {
     /// adds a default error handler to the ErrorHandler
     ///
     /// - Parameters:
-    ///   - handler: a closure containing the error, which will be called when an error isn't handled yet.
-    ///              The closure should return a bool whether or not it consumes the error
-    ///              If an error is not consumed, it will be handled by the defaultHandler as well
+    ///   - then action: the catch-all action that needs to be performed when no other match can be found
     /// - Returns: an instance of self (for chaining purposes)
     @discardableResult
-    public func `else`(do action: ActionHandler) -> ErrorHandler {
+    public func `else`(then action: ActionHandler) -> ErrorHandler {
         self.defaultAction = action
         return self
     }
@@ -61,12 +57,12 @@ open class ErrorHandler {
         
         // Check if we have a handler for this error:
         if let action = specificErrorActions.firstAction(for: error) {
-            handled = action.perform(on: view, onHandled: onHandled)
+            handled = action.perform(on: view, for: error, onHandled: onHandled)
         }
         
         // use the default handler if present
         if !handled, let defaultAction = defaultAction {
-            handled = defaultAction.perform(on: view, onHandled: onHandled)
+            handled = defaultAction.perform(on: view, for: error, onHandled: onHandled)
         }
         
         // If the error is still unhandled -> Log it

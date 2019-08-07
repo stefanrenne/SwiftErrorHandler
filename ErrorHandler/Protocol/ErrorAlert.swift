@@ -9,5 +9,5 @@
 import UIKit
 
 public protocol ErrorAlert {
-    func build(onHandled: OnErrorHandled) -> UIAlertController
+    func build(for error: Error, onHandled: OnErrorHandled) -> UIAlertController
 }

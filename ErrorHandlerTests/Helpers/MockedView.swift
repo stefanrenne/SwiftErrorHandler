@@ -28,7 +28,7 @@ class MockedView: ErrorHandlerView {
         group.leave()
     }
     
-    func customHandler(onHandled: OnErrorHandled) -> Bool {
+    func customHandler(for error: Error, onHandled: OnErrorHandled) -> Bool {
         group.leave()
         onHandled?()
         return true

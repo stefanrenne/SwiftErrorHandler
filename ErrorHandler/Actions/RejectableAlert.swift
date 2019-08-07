@@ -12,28 +12,28 @@ public struct RejectableAlert: ErrorAlert {
     let title: String
     let message: String?
     let confirmTitle: String
-    let confirmAction: (() -> Void)?
+    let confirmAction: ((Error) -> Void)?
     let rejectTitle: String
-    let rejectAction: (() -> Void)?
+    let rejectAction: ((Error) -> Void)?
     
-    public init(title: String, message: String? = nil, confirmTitle: String, confirmAction: (() -> Void)? = nil, rejectTitle: String, rejectAction: (() -> Void)? = nil) {
+    public init(title: String, message: String? = nil, confirmTitle: String, rejectTitle: String, confirmAction: ((Error) -> Void)? = nil, rejectAction: ((Error) -> Void)? = nil) {
         self.title = title
         self.message = message
         self.confirmTitle = confirmTitle
-        self.confirmAction = confirmAction
         self.rejectTitle = rejectTitle
+        self.confirmAction = confirmAction
         self.rejectAction = rejectAction
     }
     
-    public func build(onHandled: OnErrorHandled) -> UIAlertController {
+    public func build(for error: Error, onHandled: OnErrorHandled) -> UIAlertController {
         let controller = UIAlertController(title: title, message: message, preferredStyle: .alert)
         
         let confirmButton = UIAlertAction(title: confirmTitle, style: .default) { _ in
-            self.confirmAction?()
+            self.confirmAction?(error)
             onHandled?()
         }
         let rejectButton = UIAlertAction(title: rejectTitle, style: .cancel) { _ in
-            self.rejectAction?()
+            self.rejectAction?(error)
             onHandled?()
         }
         

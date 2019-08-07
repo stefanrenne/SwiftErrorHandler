@@ -11,7 +11,7 @@ import Foundation
 
 class MockedAlert: ErrorAlert {
     
-    func build(onHandled: OnErrorHandled) -> UIAlertController {
+    func build(for error: Error, onHandled: OnErrorHandled) -> UIAlertController {
         let controller = UIAlertController(title: "title", message: "message", preferredStyle: .alert)
         controller.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: nil))
         return controller

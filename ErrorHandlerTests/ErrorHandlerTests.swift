@@ -24,7 +24,7 @@ class ErrorHandlerTests: XCTestCase {
     func testItCanHandleSpecificErrors() throws {
         let view = MockedView(numberExpectedResults: 2)
         let handler = ErrorHandler(for: view)
-            .on(.error(HandlerError1.error1), do: .custom(view.customHandler))
+            .if(error: .isEqual(to: HandlerError1.error1), then: .perform(action: view.customHandler))
         
         XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: view.onHandled))
         
@@ -34,7 +34,7 @@ class ErrorHandlerTests: XCTestCase {
     func testItCantHandleSpecificErrorsWhereThereAreNoSpecificHandlers() throws {
         let view = MockedView(numberExpectedResults: 2)
         let handler = ErrorHandler(for: view)
-            .on(.error(HandlerError1.error1), do: .custom(view.customHandler))
+            .if(error: .isEqual(to: HandlerError1.error1), then: .perform(action: view.customHandler))
         
         XCTAssertFalse(handler.handle(error: HandlerError1.error2, onHandled: view.onHandled))
         
@@ -44,8 +44,8 @@ class ErrorHandlerTests: XCTestCase {
     func testItCanFallbackToADefaultHandler() throws {
         let view = MockedView(numberExpectedResults: 2)
         let handler = ErrorHandler(for: view)
-            .on(.error(HandlerError1.error1), do: .custom({ _ in XCTFail("Unexpected Handler Executed"); return false }))
-            .else(do: .custom(view.customHandler))
+            .if(error: .isEqual(to: HandlerError1.error1), then: .perform(action: { (_, _) in XCTFail("Unexpected Handler Executed"); return false }))
+            .else(then: .perform(action: view.customHandler))
         
         XCTAssertTrue(handler.handle(error: HandlerError1.error2, onHandled: view.onHandled))
         
@@ -55,8 +55,8 @@ class ErrorHandlerTests: XCTestCase {
     func testItPrefersASpecficHandlerAboveTheDefaultHandler() throws {
         let view = MockedView(numberExpectedResults: 2)
         let handler = ErrorHandler(for: view)
-            .on(.error(HandlerError1.error1), do: .custom(view.customHandler))
-            .else(do: .custom({ _ in XCTFail("Unexpected Handler Executed"); return false }))
+            .if(error: .isEqual(to: HandlerError1.error1), then: .perform(action: view.customHandler))
+            .else(then: .perform(action: { (_, _) in XCTFail("Unexpected Handler Executed"); return false }))
         
         XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: view.onHandled))
         
@@ -66,9 +66,9 @@ class ErrorHandlerTests: XCTestCase {
     func testItPrefersTheFirstMatchedHandler() throws {
         let view = MockedView(numberExpectedResults: 2)
         let handler = ErrorHandler(for: view)
-            .on(.error(HandlerError1.error1), do: .custom(view.customHandler))
-            .on(.error(HandlerError1.error1), do: .custom({ _ in XCTFail("Unexpected Handler Executed"); return false }))
-            .else(do: .custom({ _ in XCTFail("Unexpected Handler Executed"); return false }))
+            .if(error: .isEqual(to: HandlerError1.error1), then: .perform(action: view.customHandler))
+            .if(error: .isEqual(to: HandlerError1.error1), then: .perform(action: { (_, _) in XCTFail("Unexpected Handler Executed"); return false }))
+            .else(then: .perform(action: { (_, _) in XCTFail("Unexpected Handler Executed"); return false }))
         
         XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: view.onHandled))
         

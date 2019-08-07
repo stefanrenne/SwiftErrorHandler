@@ -29,16 +29,15 @@ fileprivate extension Error {
 
 class ViewController: UIViewController {
     
+    private lazy var errorHandler = ErrorHandler.default(for: self)
+        .if(error: .isEqual(to: CustomError.authenticate), then: .perform(action: startAuthentication))
+        .if(error: .matches({ $0 is RandomError }), then: .present(alert: ConfirmableAlert(title: "RandomError occurred", confirmTitle: "Ok")))
+    
     private let disposeBag = DisposeBag()
     
-    private lazy var errorHandler = ErrorHandler.default(for: self)
-        .on(.error(CustomError.authenticate), do: .custom(startAuthentication))
-        .on(.match({ $0 is RandomError }), do: .custom({ onHandled in print("win"); onHandled?(); return true }))
-    
-    private func startAuthentication(onHandled: OnErrorHandled) -> Bool {
+    private func startAuthentication(for error: Error, onHandled: OnErrorHandled) -> Bool {
         print("start authentication ...")
         onHandled?()
-        //Authentication was successfull
         return true
     }
     
@@ -47,21 +46,28 @@ class ViewController: UIViewController {
         
         Observable<String>.error(RandomError.two)
             .subscribe(onNext: { result in
-                print("Success: " + result)
-            }, onError: errorHandler.handle)
+                    print("Success: " + result)
+                },
+                onError: errorHandler.handle)
             .disposed(by: disposeBag)
         
 //        errorHandler.handle(error: RandomError.two, onHandled: { print("finished!") })
 //        errorHandler.handle(error: CustomError.authenticate)
     }
+    
+    private func error1() {
+        
+    }
+    
 
 }
 
 extension ErrorHandler {
     class func `default`(for view: ErrorHandlerView) -> ErrorHandler {
         return ErrorHandler(for: view)
-            .on(.error(CustomError.noInternet), do: .alert(ConfirmableAlert(title: "oeps something went wrong", confirmTitle: "OK")))
-            .on(.error(CustomError.logout), do: .alert(RejectableAlert(title: "are you sure you want to logout?", confirmTitle: "Yes", rejectTitle: "No")))
-            .else(do: .alert(ConfirmableAlert(title: "Unhandled Error", confirmTitle: "OK")))
+            .if(error: .has(code: NSURLErrorTimedOut), then: .present(alert: ConfirmableAlert(title: "Timeout occurred", confirmTitle: "Retry")))
+            .if(error: .isEqual(to: CustomError.noInternet), then: .present(alert: ConfirmableAlert(title: "Did you turn off the internet?", confirmTitle: "No")))
+            .if(error: .isEqual(to: CustomError.logout), then: .present(alert: RejectableAlert(title: "Are you sure you want to logout?", confirmTitle: "Yes", rejectTitle: "No", confirmAction: { error in print("Time to logout...") })))
+            .else(then: .present(alert: ConfirmableAlert(title: "Something went wrong", confirmTitle: "Ok")))
     }
 }
