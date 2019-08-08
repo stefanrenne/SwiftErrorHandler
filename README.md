@@ -28,12 +28,12 @@ The default ErrorHandler will contain the error handling logic that is common ac
 
 ```swift
 extension ErrorHandler {
-    class func `default`(for view: ErrorHandlerView) -> ErrorHandler {
-        return ErrorHandler(for: view)
-            .if(error: .has(code: NSURLErrorTimedOut), then: .present(alert: ConfirmableAlert(title: "Timeout occurred", confirmTitle: "Retry", confirmAction: { error in print("retry network call") })))
-            .if(error: .isEqual(to: CustomError.noInternet), then: .present(alert: ConfirmableAlert(title: "Did you turn off the internet?", confirmTitle: "No")))
-            .if(error: .isEqual(to: CustomError.logout), then: .present(alert: RejectableAlert(title: "Are you sure you want to logout?", confirmTitle: "Yes", rejectTitle: "No")))
-            .else(then: .present(alert: ConfirmableAlert(title: "Something went wrong", confirmTitle: "Ok")))
+  class func `default`(for view: ErrorHandlerView) -> ErrorHandler {
+    return ErrorHandler(for: view)
+      .if(error: .has(code: NSURLErrorTimedOut), then: .present(alert: ConfirmableAlert(title: "Timeout occurred", confirmTitle: "Retry", confirmAction: { error in print("retry network call") })))
+      .if(error: .isEqual(to: CustomError.noInternet), then: .present(alert: ConfirmableAlert(title: "Did you turn off the internet?", confirmTitle: "No")))
+      .if(error: .isEqual(to: CustomError.logout), then: .present(alert: RejectableAlert(title: "Are you sure you want to logout?", confirmTitle: "Yes", rejectTitle: "No")))
+      .else(then: .present(alert: ConfirmableAlert(title: "Something went wrong", confirmTitle: "Ok")))
     }
 }
 ```
@@ -52,9 +52,9 @@ Often the cases the default handler knows about will be good enough.
 
 ```swift
 do {
-	try saveStatus()
+  try saveStatus()
 } catch {
-	ErrorHandler.default.handle(error: error)
+  ErrorHandler.default.handle(error: error)
 }
 ```
 
@@ -68,23 +68,22 @@ For example in a LoginViewController
 
 class LoginViewController: UIViewController {
     
-    private lazy var errorHandler = ErrorHandler.default(for: self)
-        .if(error: .isEqual(to: CustomError.authenticate), then: .perform(action: startAuthentication))
+  private lazy var errorHandler = ErrorHandler.default(for: self)
+    .if(error: .isEqual(to: CustomError.authenticate), then: .perform(action: startAuthentication))
         
-    func performLogin() {
-	   do {
-	    	try login()
-    	} catch {
-    		errorHandler.handle(error: error)
-    	}
+  func performLogin() {
+    do {
+      try login()
+    } catch {
+      errorHandler.handle(error: error)
     }
+  }
     
-    private func startAuthentication(for error: Error, onHandled: OnErrorHandled) -> Bool {
-        print("start authentication ...")
-        onHandled?()
-        return true
-    }
-        
+  private func startAuthentication(for error: Error, onHandled: OnErrorHandled) -> Bool {
+    print("start authentication ...")
+    onHandled?()
+    return true
+  }      
 }
 ```
 
@@ -93,28 +92,28 @@ class LoginViewController: UIViewController {
 ```swift
 
 class LoginViewController: UIViewController {
+
+  private let disposeBag = DisposeBag()
     
-    private let disposeBag = DisposeBag()
-    
-    private lazy var errorHandler = ErrorHandler.default(for: self)
-        .if(error: .isEqual(to: CustomError.authenticate), then: .perform(action: startAuthentication))
+  private lazy var errorHandler = ErrorHandler.default(for: self)
+    .if(error: .isEqual(to: CustomError.authenticate), then: .perform(action: startAuthentication))
         
-    func performLogin() {
+  func performLogin() {
     
-     Observable<User>
-	     .error(CustomError.authenticate)
-        .subscribe(onNext: { result in
-	            print("User loggedin")
-            },
-            onError: errorHandler.handle)
-        .disposed(by: disposeBag)
-    }
+    Observable<User>
+      .error(CustomError.authenticate)
+      .subscribe(onNext: { result in
+          print("User loggedin")
+        },
+        onError: errorHandler.handle)
+      .disposed(by: disposeBag)
+  }
     
-    private func startAuthentication(for error: Error, onHandled: OnErrorHandled) -> Bool {
-        print("start authentication ...")
-        onHandled?()
-        return true
-    }
+  private func startAuthentication(for error: Error, onHandled: OnErrorHandled) -> Bool {
+    print("start authentication ...")
+    onHandled?()
+    return true
+  }   
         
 }
 ```
