@@ -16,6 +16,20 @@ SwiftErrorHandler enables expressing complex error handling logic with a few lin
 pod 'SwiftErrorHandler', '~> 5.0'
 ```
 
+### Swift Package Manager (SPM)
+
+```
+import PackageDescription
+
+let package = Package(
+  name: "My App",
+    dependencies: [
+      .package(url: "https://github.com/stefanrenne/SwiftErrorHandler.git", from: "5.0.0")
+    ]
+)
+```
+
+
 ## Usage
 
 Let's say we're building a messaging iOS app that uses both the network and a local database.
@@ -115,6 +129,22 @@ class LoginViewController: UIViewController {
         
 }
 ```
+
+## Contribute?
+
+**Build your xcode project using the swift package manager**
+ 
+```
+swift package generate-xcodeproj --xcconfig-overrides ./Sources/ios.xcconfig
+```
+
+
+**Quick checklist summary before submitting a PR**
+
+- 🔎 Make sure tests are added or updated to accomodate your changes. We do not accept any addition that come without tests. When possible, add tests to verify bug fixes and prevent future regressions.
+- 📖 Check that you provided a CHANGELOG entry documenting your changes (except for documentation improvements)
+- 👌 Verify that tests pass
+- 👍 Push it!
 
 
 ## Why?
