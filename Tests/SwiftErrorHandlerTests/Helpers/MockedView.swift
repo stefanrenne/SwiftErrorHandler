@@ -6,8 +6,8 @@
 //  Copyright © 2019 stefanrenne. All rights reserved.
 //
 
-import Foundation
-@testable import ErrorHandler
+import UIKit
+@testable import SwiftErrorHandler
 
 class MockedView: ErrorHandlerView {
     

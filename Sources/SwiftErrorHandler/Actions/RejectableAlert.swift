@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 public struct RejectableAlert: ErrorAlert {
     let title: String

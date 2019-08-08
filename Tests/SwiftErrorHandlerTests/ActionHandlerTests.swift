@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import ErrorHandler
+@testable import SwiftErrorHandler
 
 fileprivate enum SimpleError: Error {
     case error1
@@ -91,4 +91,15 @@ class ActionHandlerTests: XCTestCase {
         XCTAssertTrue(view.didHandleResult())
     }
     
+}
+
+extension ActionHandlerTests {
+    
+    static var allTests = [
+        ("testItCanHandleTheEmptyAction", testItCanHandleTheEmptyAction),
+        ("testItCanHandleTheAlertAction", testItCanHandleTheAlertAction),
+        ("testItCanHandleAConfirmableAlertAction", testItCanHandleAConfirmableAlertAction),
+        ("testItCanHandleARejectableAlertAction", testItCanHandleARejectableAlertAction),
+        ("testItCanHandleTheCustomAction", testItCanHandleTheCustomAction)
+    ]
 }

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 public struct ConfirmableAlert: ErrorAlert {
     let title: String

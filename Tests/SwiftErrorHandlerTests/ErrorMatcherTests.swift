@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import ErrorHandler
+@testable import SwiftErrorHandler
 
 fileprivate enum MatcherError1: Error {
     case error1
@@ -109,5 +109,14 @@ class ErrorMatcherTests: XCTestCase {
         //Validate if this handler returns true
         XCTAssertTrue(handler(searchError, nil))
     }
+}
 
+extension ErrorMatcherTests {
+    
+    static var allTests = [
+        ("testItCanMatchError", testItCanMatchError),
+        ("testItCanMatchErrorCodes", testItCanMatchErrorCodes),
+        ("testItCanMatchWithBlock", testItCanMatchWithBlock),
+        ("testItCanMatchCompleteErrorSuites", testItCanMatchCompleteErrorSuites)
+    ]
 }
