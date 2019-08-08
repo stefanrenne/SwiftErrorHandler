@@ -32,7 +32,7 @@ let package = Package(
 
 ## Usage
 
-Let's say we're building a messaging iOS app that uses both the network and a local database.
+Let's say we're building a account based iOS app that can throw errors in the networking layer and using local validation.
 
 We need to:
 
