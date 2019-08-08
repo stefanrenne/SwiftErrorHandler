@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "SwiftErrorHandler",
     platforms: [
-        .iOS(.v8), .tvOS(.v9), .watchOS(.v3)
+        .iOS(.v8), .tvOS(.v9)
     ],
     products: [
         .library(
