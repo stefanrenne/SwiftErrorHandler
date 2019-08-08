@@ -38,7 +38,7 @@ extension ErrorHandler {
 }
 ```
 
-The only required attribute is a view to present alert on, by default all UIViewControllers conform to the ErrorHandlerView protocol.
+The only required attribute is a view to present alerts on, by default all UIViewControllers conform to the ErrorHandlerView protocol. But if in your implemented architecture a different class is resposible for presenting views it is very easy to conform to this protocol.
 
 ```swift
 extension UIViewController: ErrorHandlerView { }
@@ -65,7 +65,6 @@ In cases where extra context is available you can add more cases or override the
 For example in a LoginViewController
 
 ```swift
-
 class LoginViewController: UIViewController {
     
   private lazy var errorHandler = ErrorHandler.default(for: self)
@@ -90,7 +89,6 @@ class LoginViewController: UIViewController {
 ### Bonus: RxSwift Support
 
 ```swift
-
 class LoginViewController: UIViewController {
 
   private let disposeBag = DisposeBag()
