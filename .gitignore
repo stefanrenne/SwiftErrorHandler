@@ -17,6 +17,7 @@ DerivedData/
 !default.perspectivev3
 xcuserdata/
 SwiftErrorHandler.xcodeproj/*
+cobertura.xml
 
 ## Other
 *.moved-aside

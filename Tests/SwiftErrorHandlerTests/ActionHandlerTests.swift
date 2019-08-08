@@ -9,11 +9,6 @@
 import XCTest
 @testable import SwiftErrorHandler
 
-fileprivate enum SimpleError: Error {
-    case error1
-}
-
-
 class ActionHandlerTests: XCTestCase {
     
     func testItCanHandleTheEmptyAction() throws {
@@ -91,6 +86,12 @@ class ActionHandlerTests: XCTestCase {
         XCTAssertTrue(view.didHandleResult())
     }
     
+}
+
+extension ActionHandlerTests {
+    private enum SimpleError: Error {
+        case error1
+    }
 }
 
 extension ActionHandlerTests {

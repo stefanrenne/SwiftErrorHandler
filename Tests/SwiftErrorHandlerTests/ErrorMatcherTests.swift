@@ -9,16 +9,6 @@
 import XCTest
 @testable import SwiftErrorHandler
 
-fileprivate enum MatcherError1: Error {
-    case error1
-    case error2
-    case error3
-}
-
-fileprivate enum MatcherError2: Error {
-    case error4
-}
-
 class ErrorMatcherTests: XCTestCase {
     
     func testItCanMatchError() throws {
@@ -74,7 +64,7 @@ class ErrorMatcherTests: XCTestCase {
             (ErrorMatcher.matches({ error in
                 guard let testError = error as? MatcherError1, testError == .error3 else { return true }
                 return true
-            }), ActionHandler.perform(action: { (_, _) in return true })),
+            }), ActionHandler.perform(action: { (_, _) in return true }))
         ]
         
         let searchError = MatcherError1.error3
@@ -94,7 +84,7 @@ class ErrorMatcherTests: XCTestCase {
     func testItCanMatchCompleteErrorSuites() throws {
         
         let matchers: [(ErrorMatcher, ActionHandler)] = [
-            (ErrorMatcher.matches({ $0 is MatcherError2 }), ActionHandler.perform(action: { (_, _) in return true })),
+            (ErrorMatcher.matches({ $0 is MatcherError2 }), ActionHandler.perform(action: { (_, _) in return true }))
         ]
         
         let searchError = MatcherError2.error4
@@ -108,6 +98,18 @@ class ErrorMatcherTests: XCTestCase {
         
         //Validate if this handler returns true
         XCTAssertTrue(handler(searchError, nil))
+    }
+}
+
+extension ErrorMatcherTests {
+    private enum MatcherError1: Error {
+        case error1
+        case error2
+        case error3
+    }
+    
+    private enum MatcherError2: Error {
+        case error4
     }
 }
 

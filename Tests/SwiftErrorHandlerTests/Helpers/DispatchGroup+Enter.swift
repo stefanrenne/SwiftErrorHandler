@@ -9,7 +9,7 @@
 import Foundation
 
 extension DispatchGroup {
-    class func enter(number: Int) -> DispatchGroup{
+    class func enter(number: Int) -> DispatchGroup {
         let group = DispatchGroup()
         for _ in 1...number {
             print("ENTER")

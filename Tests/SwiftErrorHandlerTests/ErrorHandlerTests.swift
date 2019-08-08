@@ -9,16 +9,6 @@
 import XCTest
 @testable import SwiftErrorHandler
 
-fileprivate enum HandlerError1: Error {
-    case error1
-    case error2
-    case error3
-}
-
-fileprivate enum HandlerError2: Error {
-    case error4
-}
-
 class ErrorHandlerTests: XCTestCase {
     
     func testItCanHandleSpecificErrors() throws {
@@ -75,6 +65,19 @@ class ErrorHandlerTests: XCTestCase {
         XCTAssertTrue(view.didHandleResult())
         
     }
+}
+
+extension ErrorHandlerTests {
+    private enum HandlerError1: Error {
+        case error1
+        case error2
+        case error3
+    }
+    
+    private enum HandlerError2: Error {
+        case error4
+    }
+
 }
 
 extension ErrorHandlerTests {

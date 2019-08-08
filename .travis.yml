@@ -1,0 +1,35 @@
+language: swift
+os: osx
+osx_image: xcode10.2
+env:
+  global:
+    - LC_CTYPE=en_US.UTF-8
+    - LANG=en_US.UTF-8
+    - PROJECT=SwiftErrorHandler.xcodeproj
+    - SCHEME=SwiftErrorHandler-Package
+    - EXPANDED_CODE_SIGN_IDENTITY=""
+    - EXPANDED_CODE_SIGN_IDENTITY_NAME=""
+    - EXPANDED_PROVISIONING_PROFILE=""
+    - DESTINATION="platform=iOS Simulator,name=iPhone XS"
+  
+install:
+  - gem install activesupport -N
+  - gem install slather
+  - git config --add diff.renamelimit 0
+
+jobs:
+  include:
+    - stage: build
+      script:
+        - swift package generate-xcodeproj --xcconfig-overrides ./Sources/ios.xcconfig
+    - stage: lint
+      script:
+        - swiftlint
+    - stage: test
+      script:
+        - set -o pipefail
+        - xcodebuild -version
+        - xcodebuild -showsdks
+        - xcodebuild -project "$PROJECT" -scheme "$SCHEME" -destination "$DESTINATION" -enableCodeCoverage YES clean build test | xcpretty
+      after_script:
+        - slather
