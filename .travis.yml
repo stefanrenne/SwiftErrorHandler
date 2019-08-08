@@ -25,6 +25,7 @@ jobs:
     - stage: lint
       script:
         - swiftlint
+        - pod lib lint
     - stage: test
       script:
         - set -o pipefail
@@ -33,3 +34,7 @@ jobs:
         - xcodebuild -project "$PROJECT" -scheme "$SCHEME" -destination "$DESTINATION" -enableCodeCoverage YES clean build test | xcpretty
       after_script:
         - slather
+    - stage: deploy
+      if: tag IS present
+      script:
+        - pod trunk push --allow-warnings
