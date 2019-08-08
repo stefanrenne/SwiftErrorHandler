@@ -6,6 +6,7 @@ Pod::Spec.new do |spec|
   spec.authors                = { 'Stefan Renne' => 'info@stefanrenne.nl' }
   spec.summary                = 'Flexible library for handling Swift Errors'
   spec.source                 = { :git => 'https://github.com/stefanrenne/SwiftErrorHandler.git', :tag => spec.version.to_s }
+  spec.default_subspecs       = 'UIKit', 'Foundation'
   spec.swift_version          = '5.0'
   spec.ios.deployment_target  = '8.0'
   spec.tvos.deployment_target = '9.0'

@@ -13,8 +13,6 @@ env:
     - DESTINATION="platform=iOS Simulator,name=iPhone XS"
   
 install:
-  - gem install activesupport -N
-  - gem install slather
   - git config --add diff.renamelimit 0
 
 jobs:
@@ -25,11 +23,12 @@ jobs:
         - pod lib lint
     - stage: test
       before_script:
+        - gem install slather
+      script:
         - set -o pipefail
         - xcodebuild -version
         - xcodebuild -showsdks
         - swift package generate-xcodeproj --xcconfig-overrides ./Sources/ios.xcconfig
-      script:
         - xcodebuild -project "$PROJECT" -scheme "$SCHEME" -destination "$DESTINATION" -enableCodeCoverage YES clean build test | xcpretty
       after_script:
         - slather
