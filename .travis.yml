@@ -19,18 +19,17 @@ install:
 
 jobs:
   include:
-    - stage: build
-      script:
-        - swift package generate-xcodeproj --xcconfig-overrides ./Sources/ios.xcconfig
     - stage: lint
       script:
         - swiftlint
         - pod lib lint
     - stage: test
-      script:
+      before_script:
         - set -o pipefail
         - xcodebuild -version
         - xcodebuild -showsdks
+        - swift package generate-xcodeproj --xcconfig-overrides ./Sources/ios.xcconfig
+      script:
         - xcodebuild -project "$PROJECT" -scheme "$SCHEME" -destination "$DESTINATION" -enableCodeCoverage YES clean build test | xcpretty
       after_script:
         - slather
