@@ -11,6 +11,7 @@ import Foundation
 public enum ErrorMatcher {
     case type(Error)
     case code(Int)
+    case domain(String)
     case match((Error) -> Bool)
 }
 
@@ -19,6 +20,8 @@ extension Array where Element == (ErrorMatcher, ActionHandler) {
         return compactMap { (onError, action) -> ActionHandler? in
             switch onError {
             case .code(let code) where code == error._code:
+                return action
+            case .domain(let domain) where domain == error._domain:
                 return action
             case .type(let matcher) where matcher.reflectedString == error.reflectedString:
                 return action

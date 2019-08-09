@@ -14,9 +14,9 @@ class ErrorMatcherTests: XCTestCase {
     func testItCanMatchError() throws {
         
         let matchers: [(ErrorMatcher, ActionHandler)] = [
-            (ErrorMatcher.type(MatcherError1.error2), ActionHandler.perform(action: { (_, _) in XCTFail("Incorrect Handler executed") })),
-            (ErrorMatcher.type(MatcherError2.error4), ActionHandler.perform(action: { (_, _) in XCTFail("Incorrect Handler executed") })),
-            (ErrorMatcher.type(MatcherError1.error1), ActionHandler.perform(action: { (_, _) in }))
+            (ErrorMatcher.type(MatcherError1.error2), ActionHandler.perform(action: unexpectedHandlerExecuted)),
+            (ErrorMatcher.type(MatcherError2.error4), ActionHandler.perform(action: unexpectedHandlerExecuted)),
+            (ErrorMatcher.type(MatcherError1.error1), ActionHandler.perform(action: correctHandlerExecuted))
         ]
         
         let searchError = MatcherError1.error1
@@ -37,11 +37,11 @@ class ErrorMatcherTests: XCTestCase {
     func testItCanMatchErrorCodes() throws {
         
         let matchers: [(ErrorMatcher, ActionHandler)] = [
-            (ErrorMatcher.type(MatcherError1.error2), ActionHandler.perform(action: { (_, _) in XCTFail("Incorrect Handler executed") })),
-            (ErrorMatcher.type(MatcherError2.error4), ActionHandler.perform(action: { (_, _) in XCTFail("Incorrect Handler executed") })),
-            (ErrorMatcher.code(404), .perform(action: { (_, _) in XCTFail("Incorrect Handler executed") })),
-            (ErrorMatcher.code(400), .perform(action: { (_, _) in })),
-            (ErrorMatcher.type(MatcherError1.error1), ActionHandler.perform(action: { (_, _) in XCTFail("Incorrect Handler executed") }))
+            (ErrorMatcher.type(MatcherError1.error2), ActionHandler.perform(action: unexpectedHandlerExecuted)),
+            (ErrorMatcher.type(MatcherError2.error4), ActionHandler.perform(action: unexpectedHandlerExecuted)),
+            (ErrorMatcher.code(404), .perform(action: unexpectedHandlerExecuted)),
+            (ErrorMatcher.code(400), .perform(action: correctHandlerExecuted)),
+            (ErrorMatcher.type(MatcherError1.error1), ActionHandler.perform(action: unexpectedHandlerExecuted))
         ]
         
         let searchError = NSError(domain: "damain", code: 400, userInfo: ["data": "value"])
@@ -60,15 +60,41 @@ class ErrorMatcherTests: XCTestCase {
         
     }
     
+    func testItCanMatchErrorDomains() throws {
+        
+        let matchers: [(ErrorMatcher, ActionHandler)] = [
+            (ErrorMatcher.type(MatcherError1.error2), ActionHandler.perform(action: unexpectedHandlerExecuted)),
+            (ErrorMatcher.type(MatcherError2.error4), ActionHandler.perform(action: unexpectedHandlerExecuted)),
+            (ErrorMatcher.domain("remote"), .perform(action: correctHandlerExecuted)),
+            (ErrorMatcher.code(400), .perform(action: unexpectedHandlerExecuted)),
+            (ErrorMatcher.type(MatcherError1.error1), ActionHandler.perform(action: unexpectedHandlerExecuted))
+        ]
+        
+        let searchError = NSError(domain: "remote", code: 401, userInfo: ["data": "value"])
+        
+        // Find the validator for this error
+        let actionHandlers = matchers.actions(for: searchError)
+        guard actionHandlers.count == 1,
+            let actionHandler = actionHandlers.first,
+            case ActionHandler.perform(action: let handler) = actionHandler else {
+                XCTFail("Couldn't find action handler for error code 400")
+                return
+        }
+        
+        // Validate if the correct handler is executed
+        handler(searchError, nil)
+        
+    }
+    
     func testItCanMatchWithBlock() throws {
         
         let matchers: [(ErrorMatcher, ActionHandler)] = [
-            (ErrorMatcher.type(MatcherError1.error2), ActionHandler.perform(action: { (_, _) in XCTFail("Incorrect Handler executed") })),
-            (ErrorMatcher.code(404), .perform(action: { (_, _) in XCTFail("Incorrect Handler executed") })),
+            (ErrorMatcher.type(MatcherError1.error2), ActionHandler.perform(action: unexpectedHandlerExecuted)),
+            (ErrorMatcher.code(404), .perform(action: unexpectedHandlerExecuted)),
             (ErrorMatcher.match({ error in
                 guard let testError = error as? MatcherError1, testError == .error3 else { return true }
                 return true
-            }), ActionHandler.perform(action: { (_, _) in }))
+            }), ActionHandler.perform(action: correctHandlerExecuted))
         ]
         
         let searchError = MatcherError1.error3
@@ -90,7 +116,7 @@ class ErrorMatcherTests: XCTestCase {
     func testItCanMatchCompleteErrorSuites() throws {
         
         let matchers: [(ErrorMatcher, ActionHandler)] = [
-            (ErrorMatcher.match({ $0 is MatcherError2 }), ActionHandler.perform(action: { (_, _) in }))
+            (ErrorMatcher.match({ $0 is MatcherError2 }), ActionHandler.perform(action: correctHandlerExecuted))
         ]
         
         let searchError = MatcherError2.error4
@@ -110,6 +136,13 @@ class ErrorMatcherTests: XCTestCase {
 }
 
 extension ErrorMatcherTests {
+    
+    func correctHandlerExecuted(for error: Error, onHandled: OnErrorHandled) { }
+    
+    func unexpectedHandlerExecuted(for error: Error, onHandled: OnErrorHandled) {
+        XCTFail("Unexpected Handler Executed")
+    }
+    
     private enum MatcherError1: Error {
         case error1
         case error2
@@ -126,6 +159,7 @@ extension ErrorMatcherTests {
     static var allTests = [
         ("testItCanMatchError", testItCanMatchError),
         ("testItCanMatchErrorCodes", testItCanMatchErrorCodes),
+        ("testItCanMatchErrorDomains", testItCanMatchErrorDomains),
         ("testItCanMatchWithBlock", testItCanMatchWithBlock),
         ("testItCanMatchCompleteErrorSuites", testItCanMatchCompleteErrorSuites)
     ]

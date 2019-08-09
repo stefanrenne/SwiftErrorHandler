@@ -46,8 +46,8 @@ extension ErrorHandler {
   class func `default`(for view: ErrorHandlerView) -> ErrorHandler {
     return ErrorHandler(for: view)
       .on(error: .code(NSURLErrorTimedOut), then: .present(alert: ConfirmableAlert(title: "Timeout occurred", confirmTitle: "Retry", confirmAction: { error in print("retry network call") })))
-      .on(error: .type(CustomError.noInternet), then: .present(alert: ConfirmableAlert(title: "Did you turn off the internet?", confirmTitle: "No")))
-      .on(error: .type(CustomError.logout), then: .present(alert: RejectableAlert(title: "Are you sure you want to logout?", confirmTitle: "Yes", rejectTitle: "No")))
+      .on(error: .type(NetworkError.noInternet), then: .present(alert: ConfirmableAlert(title: "Did you turn off the internet?", confirmTitle: "No")))
+      .on(error: .type(NetworkError.logout), then: .present(alert: RejectableAlert(title: "Are you sure you want to logout?", confirmTitle: "Yes", rejectTitle: "No")))
       .always(.perform(action: logErrorToAnalytics))
       .onNoMatch(.present(alert: ConfirmableAlert(title: "Something went wrong", confirmTitle: "Ok")))
     }
@@ -93,7 +93,7 @@ For example in a LoginViewController
 class LoginViewController: UIViewController {
     
   private lazy var errorHandler = ErrorHandler.default(for: self)
-    .on(error: .type(CustomError.authenticate), then: .perform(action: startAuthentication))
+    .on(error: .type(NetworkError.authenticate), then: .perform(action: startAuthentication))
         
   func performLogin() {
     do {
@@ -119,12 +119,12 @@ class LoginViewController: UIViewController {
   private let disposeBag = DisposeBag()
     
   private lazy var errorHandler = ErrorHandler.default(for: self)
-    .on(error: .type(CustomError.authenticate), then: .perform(action: startAuthentication))
+    .on(error: .type(NetworkError.authenticate), then: .perform(action: startAuthentication))
         
   func performLogin() {
     
     Observable<User>
-      .error(CustomError.authenticate)
+      .error(NetworkError.authenticate)
       .subscribe(onNext: { result in
           print("User loggedin")
         },
