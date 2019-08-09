@@ -12,19 +12,19 @@ import XCTest
 class ActionHandlerTests: XCTestCase {
     
     func testItCanHandleTheEmptyAction() throws {
-        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 0, numberExpectedOnHandled: 1)
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 0, numberExpectedonCompleted: 1)
         
-        let didHandleAction = ActionHandler.doNothing.perform(on: view, for: SimpleError.error1, onHandled: view.onHandled)
+        let didHandleAction = ActionHandler.doNothing.perform(on: view, for: SimpleError.error1, onCompleted: view.onCompleted)
         didHandleAction()
         
         XCTAssertTrue(view.didHandleResult())
     }
     
     func testItCanHandleTheAlertAction() throws {
-        let view = MockedView(numberExpectedPresentedAlerts: 1, numberExpectedCustomHandlers: 0, numberExpectedOnHandled: 0)
+        let view = MockedView(numberExpectedPresentedAlerts: 1, numberExpectedCustomHandlers: 0, numberExpectedonCompleted: 0)
         let alert = MockedAlert()
 
-        let didHandleAction = ActionHandler.present(alert: alert).perform(on: view, for: SimpleError.error1, onHandled: nil)
+        let didHandleAction = ActionHandler.present(alert: alert).perform(on: view, for: SimpleError.error1, onCompleted: nil)
         didHandleAction()
         
         XCTAssertTrue(view.didHandleResult())
@@ -38,10 +38,10 @@ class ActionHandlerTests: XCTestCase {
     }
     
     func testItCanHandleAConfirmableAlertAction() throws {
-        let view = MockedView(numberExpectedPresentedAlerts: 1, numberExpectedCustomHandlers: 0, numberExpectedOnHandled: 0)
+        let view = MockedView(numberExpectedPresentedAlerts: 1, numberExpectedCustomHandlers: 0, numberExpectedonCompleted: 0)
         let alert = ConfirmableAlert(title: "title", message: "message", confirmTitle: "confirm", confirmAction: nil)
         
-        let didHandleAction = ActionHandler.present(alert: alert).perform(on: view, for: SimpleError.error1, onHandled: nil)
+        let didHandleAction = ActionHandler.present(alert: alert).perform(on: view, for: SimpleError.error1, onCompleted: nil)
         didHandleAction()
         
         XCTAssertTrue(view.didHandleResult())
@@ -55,10 +55,10 @@ class ActionHandlerTests: XCTestCase {
     }
     
     func testItCanHandleARejectableAlertAction() throws {
-        let view = MockedView(numberExpectedPresentedAlerts: 1, numberExpectedCustomHandlers: 0, numberExpectedOnHandled: 0)
+        let view = MockedView(numberExpectedPresentedAlerts: 1, numberExpectedCustomHandlers: 0, numberExpectedonCompleted: 0)
         let alert = RejectableAlert(title: "title", message: "message", confirmTitle: "YES", rejectTitle: "NO", confirmAction: nil, rejectAction: nil)
         
-        let didHandleAction = ActionHandler.present(alert: alert).perform(on: view, for: SimpleError.error1, onHandled: nil)
+        let didHandleAction = ActionHandler.present(alert: alert).perform(on: view, for: SimpleError.error1, onCompleted: nil)
         didHandleAction()
         
         XCTAssertTrue(view.didHandleResult())
@@ -75,9 +75,9 @@ class ActionHandlerTests: XCTestCase {
     }
 
     func testItCanHandleTheCustomAction() throws {
-        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 1, numberExpectedOnHandled: 1)
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 1, numberExpectedonCompleted: 1)
         
-        let didHandleAction = ActionHandler.perform(action: view.customHandler).perform(on: view, for: SimpleError.error1, onHandled: view.onHandled)
+        let didHandleAction = ActionHandler.perform(action: view.customHandler).perform(on: view, for: SimpleError.error1, onCompleted: view.onCompleted)
         didHandleAction()
         
         XCTAssertTrue(view.didHandleResult())

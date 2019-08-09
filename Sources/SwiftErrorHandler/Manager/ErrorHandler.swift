@@ -59,10 +59,10 @@ open class ErrorHandler {
     /// This function is called to handle an error
     ///
     /// - Parameter error: The error that should be handled
-    /// - Parameter onHandled: The optional block that gets executed after the error has been handled successfully
+    /// - Parameter onCompleted: The optional block that gets executed after the error has been handled successfully
     /// - Returns: an boolean inidication if the error was handled successfully
     @discardableResult
-    public func handle(error: Error, onHandled: OnErrorHandled) -> Bool {
+    public func handle(error: Error, onCompleted: OnErrorHandled) -> Bool {
         
         // Check if we have a handler for this error:
         let specificErrorHandlers: [ActionHandler] = specificErrorActions.actions(for: error)
@@ -78,8 +78,8 @@ open class ErrorHandler {
         let chainedActions = actions
             .reversed()
             .reduce(into: [() -> Void]()) { (result, action) in
-                let previousAction = result.last ?? onHandled
-                let actionRow = action.perform(on: view, for: error, onHandled: previousAction)
+                let previousAction = result.last ?? onCompleted
+                let actionRow = action.perform(on: view, for: error, onCompleted: previousAction)
                 result.append(actionRow)
             }
             .reversed()
@@ -105,6 +105,6 @@ open class ErrorHandler {
     ///
     /// - Parameter error: The error that should be handled
     public func handle(error: Error) {
-        handle(error: error, onHandled: nil)
+        handle(error: error, onCompleted: nil)
     }
 }

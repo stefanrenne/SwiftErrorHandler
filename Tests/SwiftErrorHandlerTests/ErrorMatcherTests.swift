@@ -137,9 +137,9 @@ class ErrorMatcherTests: XCTestCase {
 
 extension ErrorMatcherTests {
     
-    func correctHandlerExecuted(for error: Error, onHandled: OnErrorHandled) { }
+    func correctHandlerExecuted(for error: Error, onCompleted: OnErrorHandled) { }
     
-    func unexpectedHandlerExecuted(for error: Error, onHandled: OnErrorHandled) {
+    func unexpectedHandlerExecuted(for error: Error, onCompleted: OnErrorHandled) {
         XCTFail("Unexpected Handler Executed")
     }
     

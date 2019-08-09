@@ -22,11 +22,11 @@ public struct ConfirmableAlert: ErrorAlert {
         self.confirmAction = confirmAction
     }
     
-    public func build(for error: Error, onHandled: OnErrorHandled) -> UIAlertController {
+    public func build(for error: Error, onCompleted: OnErrorHandled) -> UIAlertController {
         let controller = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let confirmButton = UIAlertAction(title: confirmTitle, style: .default) { _ in
             self.confirmAction?(error)
-            onHandled?()
+            onCompleted?()
         }
         controller.addAction(confirmButton)
         return controller

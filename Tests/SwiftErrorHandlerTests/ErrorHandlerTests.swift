@@ -12,91 +12,91 @@ import XCTest
 class ErrorHandlerTests: XCTestCase {
     
     func testItCanHandleSpecificErrors() throws {
-        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 1, numberExpectedOnHandled: 1)
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 1, numberExpectedonCompleted: 1)
         let handler = ErrorHandler(for: view)
             .on(error: .type(HandlerError1.error1), then: .perform(action: view.customHandler))
         
-        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: view.onHandled))
+        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onCompleted: view.onCompleted))
         
         XCTAssertTrue(view.didHandleResult())
     }
     
     func testItCantHandleSpecificErrorsWhereThereAreNoSpecificHandlers() throws {
-        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 1, numberExpectedOnHandled: 1)
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 1, numberExpectedonCompleted: 1)
         let handler = ErrorHandler(for: view)
             .on(error: .type(HandlerError1.error1), then: .perform(action: view.customHandler))
         
-        XCTAssertFalse(handler.handle(error: HandlerError1.error2, onHandled: view.onHandled))
+        XCTAssertFalse(handler.handle(error: HandlerError1.error2, onCompleted: view.onCompleted))
         
         XCTAssertFalse(view.didHandleResult())
     }
     
     func testItCanFallbackToADefaultHandler() throws {
-        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 1, numberExpectedOnHandled: 1)
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 1, numberExpectedonCompleted: 1)
         let handler = ErrorHandler(for: view)
             .on(error: .type(HandlerError1.error1), then: .perform(action: view.unexpectedHandlerExecuted))
             .onNoMatch(.perform(action: view.customHandler))
         
-        XCTAssertTrue(handler.handle(error: HandlerError1.error2, onHandled: view.onHandled))
+        XCTAssertTrue(handler.handle(error: HandlerError1.error2, onCompleted: view.onCompleted))
         
         XCTAssertTrue(view.didHandleResult())
     }
     
     func testItPrefersASpecficHandlerAboveTheDefaultHandler() throws {
-        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 1, numberExpectedOnHandled: 1)
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 1, numberExpectedonCompleted: 1)
         let handler = ErrorHandler(for: view)
             .on(error: .type(HandlerError1.error1), then: .perform(action: view.customHandler))
             .onNoMatch(.perform(action: view.unexpectedHandlerExecuted))
         
-        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: view.onHandled))
+        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onCompleted: view.onCompleted))
         
         XCTAssertTrue(view.didHandleResult())
     }
     
     func testItCanExecuteMultupleMatches() throws {
-        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 2, numberExpectedOnHandled: 1)
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 2, numberExpectedonCompleted: 1)
         let handler = ErrorHandler(for: view)
             .on(error: .type(HandlerError1.error1), then: .perform(action: view.customHandler))
             .on(error: .type(HandlerError1.error1), then: .perform(action: view.customHandler))
             .onNoMatch(.perform(action: view.unexpectedHandlerExecuted))
         
-        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: view.onHandled))
+        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onCompleted: view.onCompleted))
         
         XCTAssertTrue(view.didHandleResult())
     }
     
     func testItCanHaveHandlersThatAlwaysGetExecuted() throws {
-        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 2, numberExpectedOnHandled: 1)
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 2, numberExpectedonCompleted: 1)
         let handler = ErrorHandler(for: view)
             .on(error: .type(HandlerError1.error1), then: .perform(action: view.customHandler))
             .onNoMatch(.perform(action: view.unexpectedHandlerExecuted))
             .always(.perform(action: view.customHandler))
         
-        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: view.onHandled))
+        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onCompleted: view.onCompleted))
         
         XCTAssertTrue(view.didHandleResult())
     }
     
     func testItCanHaveMultipleAlwaysHandlers() {
-        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 3, numberExpectedOnHandled: 0)
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 3, numberExpectedonCompleted: 0)
         let handler = ErrorHandler(for: view)
             .always(.perform(action: view.customHandler))
             .always(.perform(action: view.customHandler))
             .always(.perform(action: view.customHandler))
         
-        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: nil))
+        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onCompleted: nil))
         
         XCTAssertTrue(view.didHandleResult())
     }
     
     func testItCanHaveMultipleDefaultHandlers() {
-        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 3, numberExpectedOnHandled: 0)
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 3, numberExpectedonCompleted: 0)
         let handler = ErrorHandler(for: view)
             .onNoMatch(.perform(action: view.customHandler))
             .onNoMatch(.perform(action: view.customHandler))
             .onNoMatch(.perform(action: view.customHandler))
         
-        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: nil))
+        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onCompleted: nil))
         
         XCTAssertTrue(view.didHandleResult())
     }

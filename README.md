@@ -48,28 +48,11 @@ extension ErrorHandler {
       .on(error: .code(NSURLErrorTimedOut), then: .present(alert: ConfirmableAlert(title: "Timeout occurred", confirmTitle: "Retry", confirmAction: { error in print("retry network call") })))
       .on(error: .type(NetworkError.noInternet), then: .present(alert: ConfirmableAlert(title: "Did you turn off the internet?", confirmTitle: "No")))
       .on(error: .type(NetworkError.logout), then: .present(alert: RejectableAlert(title: "Are you sure you want to logout?", confirmTitle: "Yes", rejectTitle: "No")))
-      .always(.perform(action: logErrorToAnalytics))
+      .always(.perform(action: AnalyticsService.track))
       .onNoMatch(.present(alert: ConfirmableAlert(title: "Something went wrong", confirmTitle: "Ok")))
     }
 }
 ```
-
-The only required attribute is a view to present alerts on, by default all UIViewControllers conform to the ErrorHandlerView protocol. But if in your implemented architecture a different class is resposible for presenting views it is very easy to conform to this protocol.
-
-```swift
-public protocol ErrorHandlerView {
-  func present(alert: UIAlertController)
-}
-
-extension UIViewController: ErrorHandlerView {
-  public func present(alert: UIAlertController) {
-    present(alert, animated: true, completion: nil)
-  }
-}
-
-```
-
-
 
 ### Use the default handler to handle common cases
 
@@ -103,43 +86,117 @@ class LoginViewController: UIViewController {
     }
   }
     
-  private func startAuthentication(for error: Error, onHandled: OnErrorHandled) -> Bool {
+  private func startAuthentication(for error: Error, onCompleted: OnErrorHandled) {
     print("start authentication ...")
-    onHandled?()
+    onCompleted?()
     return true
   }      
 }
 ```
 
+
 ### Bonus: RxSwift Support
 
 ```swift
-class LoginViewController: UIViewController {
-
-  private let disposeBag = DisposeBag()
-    
-  private lazy var errorHandler = ErrorHandler.default(for: self)
-    .on(error: .type(NetworkError.authenticate), then: .perform(action: startAuthentication))
-        
-  func performLogin() {
-    
-    Observable<User>
-      .error(NetworkError.authenticate)
-      .subscribe(onNext: { result in
-          print("User loggedin")
-        },
-        onError: errorHandler.handle)
-      .disposed(by: disposeBag)
-  }
-    
-  private func startAuthentication(for error: Error, onHandled: OnErrorHandled) -> Bool {
-    print("start authentication ...")
-    onHandled?()
-    return true
-  }   
-        
-}
+Observable<User>
+  .error(NetworkError.authenticate)
+  .subscribe(onNext: { result in
+      print("User loggedin")
+    },
+    onError: ErrorHandler.default.handle)
+  .disposed(by: disposeBag)
 ```
+
+## Customization options
+
+### The way actions can be performed for errors
+
+- Performs actions for specific errors
+	`errorHandler.on(error: .code(404), then: .present(Alert))`
+
+- Performs actions when no specific error matcher can be found 
+	`errorHandler.onNoMatch(.present(Alert))`
+
+- Actions that need to be performed for all errors
+	`errorHandler.always(.perform(action: analyticsService.track))`
+
+
+### Error Matchers
+
+**Match on specific error type**
+
+`.on(error: .type(NetworkError.authenticate), then: .doNothing)`
+
+#### Match on NSError code
+
+`.on(error: .code(404), then: .doNothing)`
+
+#### Match on NSError domain
+
+`.on(error: .domain("remote"), then: .doNothing)`
+
+#### Custom matching
+
+```
+.on(error: .match({ error in 
+  ...
+  return true
+}), then: .doNothing)
+```
+
+### Error Handling
+
+#### Do nothing
+
+It mainly exists to make documentation & unit tests to understand.
+
+`.on(error: .code(404), then: .doNothing)`
+
+
+#### Present Alert
+
+The Alert is presented on the View provided in the ErrorHandler init
+
+`.on(error: .code(404), then: .present(alert: ErrorAlert))`
+
+By default there are two alert types that you can present:
+
+- **ConfirmableAlert**: An alert with one action button
+- **RejectableAlert**: An alert with two action buttons
+ 
+Would you like to use different alerts?
+
+1. Create a struct that conforms to the **ErrorAlert** protocol
+2. Implement the function that builds your custom UIAlertController 
+`func build(for error: Error, onCompleted: OnErrorHandled) -> UIAlertController`
+3. Make sure the optional `onCompleted` completionblock has been performed in all `UIAlertAction` completion blocks
+
+#### Custom Action
+
+The only limitation is your mind.
+
+`.on(error: .code(404), then: .perform(action: CustomActionHandler)`
+
+The **CustomActionHandler** provides the `Error` and an optional `onCompleted` completionblock that needs to be executed when your custom action has been performed.
+
+
+#### Implementing the ErrorHandler outside the ViewController
+
+In larger apps it makes sense to implement the ErrorHandler in a different class then the ViewController, to make this work you need to provide a view on which alerts can be presented, this can be done by conforming to the ErrorHandlerView protocol.
+
+```swift
+public protocol ErrorHandlerView {
+  func present(alert: UIAlertController)
+}
+
+extension UIViewController: ErrorHandlerView {
+  public func present(alert: UIAlertController) {
+    present(alert, animated: true, completion: nil)
+  }
+}
+
+```
+
 
 ## Contribute?
 

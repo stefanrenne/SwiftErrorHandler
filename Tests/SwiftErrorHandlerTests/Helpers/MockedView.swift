@@ -14,13 +14,13 @@ class MockedView: ErrorHandlerView {
     
     private let presentedAlertsGroups: DispatchGroup
     private let customHandlersGroup: DispatchGroup
-    private let onHandledGroups: DispatchGroup
+    private let onCompletedGroups: DispatchGroup
     var lastResult: UIAlertController?
     
-    init(numberExpectedPresentedAlerts: Int, numberExpectedCustomHandlers: Int, numberExpectedOnHandled: Int) {
+    init(numberExpectedPresentedAlerts: Int, numberExpectedCustomHandlers: Int, numberExpectedonCompleted: Int) {
         presentedAlertsGroups = DispatchGroup.enter(number: numberExpectedPresentedAlerts)
         customHandlersGroup = DispatchGroup.enter(number: numberExpectedCustomHandlers)
-        onHandledGroups = DispatchGroup.enter(number: numberExpectedOnHandled)
+        onCompletedGroups = DispatchGroup.enter(number: numberExpectedonCompleted)
     }
     
     func present(alert: UIAlertController) {
@@ -28,23 +28,23 @@ class MockedView: ErrorHandlerView {
         presentedAlertsGroups.leave()
     }
     
-    func onHandled() {
-        onHandledGroups.leave()
+    func onCompleted() {
+        onCompletedGroups.leave()
     }
     
-    func unexpectedHandlerExecuted(for error: Error, onHandled: OnErrorHandled) {
+    func unexpectedHandlerExecuted(for error: Error, onCompleted: OnErrorHandled) {
         XCTFail("Unexpected Handler Executed")
     }
     
-    func customHandler(for error: Error, onHandled: OnErrorHandled) {
+    func customHandler(for error: Error, onCompleted: OnErrorHandled) {
         customHandlersGroup.leave()
-        onHandled?()
+        onCompleted?()
     }
     
     func didHandleResult() -> Bool {
         let timeout: DispatchTime = .now() + .milliseconds(200)
         return presentedAlertsGroups.wait(timeout: timeout) == .success &&
                customHandlersGroup.wait(timeout: timeout) == .success &&
-               onHandledGroups.wait(timeout: timeout) == .success
+               onCompletedGroups.wait(timeout: timeout) == .success
     }
 }

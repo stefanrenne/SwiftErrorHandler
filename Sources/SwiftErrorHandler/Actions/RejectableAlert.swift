@@ -26,16 +26,16 @@ public struct RejectableAlert: ErrorAlert {
         self.rejectAction = rejectAction
     }
     
-    public func build(for error: Error, onHandled: OnErrorHandled) -> UIAlertController {
+    public func build(for error: Error, onCompleted: OnErrorHandled) -> UIAlertController {
         let controller = UIAlertController(title: title, message: message, preferredStyle: .alert)
         
         let confirmButton = UIAlertAction(title: confirmTitle, style: .default) { _ in
             self.confirmAction?(error)
-            onHandled?()
+            onCompleted?()
         }
         let rejectButton = UIAlertAction(title: rejectTitle, style: .cancel) { _ in
             self.rejectAction?(error)
-            onHandled?()
+            onCompleted?()
         }
         
         controller.addAction(confirmButton)
