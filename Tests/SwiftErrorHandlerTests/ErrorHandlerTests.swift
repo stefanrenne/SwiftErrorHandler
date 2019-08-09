@@ -12,9 +12,9 @@ import XCTest
 class ErrorHandlerTests: XCTestCase {
     
     func testItCanHandleSpecificErrors() throws {
-        let view = MockedView(numberExpectedResults: 2)
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 1, numberExpectedOnHandled: 1)
         let handler = ErrorHandler(for: view)
-            .if(error: .isEqual(to: HandlerError1.error1), then: .perform(action: view.customHandler))
+            .on(error: .type(HandlerError1.error1), then: .perform(action: view.customHandler))
         
         XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: view.onHandled))
         
@@ -22,9 +22,9 @@ class ErrorHandlerTests: XCTestCase {
     }
     
     func testItCantHandleSpecificErrorsWhereThereAreNoSpecificHandlers() throws {
-        let view = MockedView(numberExpectedResults: 2)
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 1, numberExpectedOnHandled: 1)
         let handler = ErrorHandler(for: view)
-            .if(error: .isEqual(to: HandlerError1.error1), then: .perform(action: view.customHandler))
+            .on(error: .type(HandlerError1.error1), then: .perform(action: view.customHandler))
         
         XCTAssertFalse(handler.handle(error: HandlerError1.error2, onHandled: view.onHandled))
         
@@ -32,10 +32,10 @@ class ErrorHandlerTests: XCTestCase {
     }
     
     func testItCanFallbackToADefaultHandler() throws {
-        let view = MockedView(numberExpectedResults: 2)
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 1, numberExpectedOnHandled: 1)
         let handler = ErrorHandler(for: view)
-            .if(error: .isEqual(to: HandlerError1.error1), then: .perform(action: { (_, _) in XCTFail("Unexpected Handler Executed"); return false }))
-            .else(then: .perform(action: view.customHandler))
+            .on(error: .type(HandlerError1.error1), then: .perform(action: view.unexpectedHandlerExecuted))
+            .onNoMatch(.perform(action: view.customHandler))
         
         XCTAssertTrue(handler.handle(error: HandlerError1.error2, onHandled: view.onHandled))
         
@@ -43,28 +43,64 @@ class ErrorHandlerTests: XCTestCase {
     }
     
     func testItPrefersASpecficHandlerAboveTheDefaultHandler() throws {
-        let view = MockedView(numberExpectedResults: 2)
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 1, numberExpectedOnHandled: 1)
         let handler = ErrorHandler(for: view)
-            .if(error: .isEqual(to: HandlerError1.error1), then: .perform(action: view.customHandler))
-            .else(then: .perform(action: { (_, _) in XCTFail("Unexpected Handler Executed"); return false }))
+            .on(error: .type(HandlerError1.error1), then: .perform(action: view.customHandler))
+            .onNoMatch(.perform(action: view.unexpectedHandlerExecuted))
         
         XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: view.onHandled))
         
         XCTAssertTrue(view.didHandleResult())
     }
     
-    func testItPrefersTheFirstMatchedHandler() throws {
-        let view = MockedView(numberExpectedResults: 2)
+    func testItCanExecuteMultupleMatches() throws {
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 2, numberExpectedOnHandled: 1)
         let handler = ErrorHandler(for: view)
-            .if(error: .isEqual(to: HandlerError1.error1), then: .perform(action: view.customHandler))
-            .if(error: .isEqual(to: HandlerError1.error1), then: .perform(action: { (_, _) in XCTFail("Unexpected Handler Executed"); return false }))
-            .else(then: .perform(action: { (_, _) in XCTFail("Unexpected Handler Executed"); return false }))
+            .on(error: .type(HandlerError1.error1), then: .perform(action: view.customHandler))
+            .on(error: .type(HandlerError1.error1), then: .perform(action: view.customHandler))
+            .onNoMatch(.perform(action: view.unexpectedHandlerExecuted))
         
         XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: view.onHandled))
         
         XCTAssertTrue(view.didHandleResult())
-        
     }
+    
+    func testItCanHaveHandlersThatAlwaysGetExecuted() throws {
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 2, numberExpectedOnHandled: 1)
+        let handler = ErrorHandler(for: view)
+            .on(error: .type(HandlerError1.error1), then: .perform(action: view.customHandler))
+            .onNoMatch(.perform(action: view.unexpectedHandlerExecuted))
+            .always(.perform(action: view.customHandler))
+        
+        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: view.onHandled))
+        
+        XCTAssertTrue(view.didHandleResult())
+    }
+    
+    func testItCanHaveMultipleAlwaysHandlers() {
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 3, numberExpectedOnHandled: 0)
+        let handler = ErrorHandler(for: view)
+            .always(.perform(action: view.customHandler))
+            .always(.perform(action: view.customHandler))
+            .always(.perform(action: view.customHandler))
+        
+        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: nil))
+        
+        XCTAssertTrue(view.didHandleResult())
+    }
+    
+    func testItCanHaveMultipleDefaultHandlers() {
+        let view = MockedView(numberExpectedPresentedAlerts: 0, numberExpectedCustomHandlers: 3, numberExpectedOnHandled: 0)
+        let handler = ErrorHandler(for: view)
+            .onNoMatch(.perform(action: view.customHandler))
+            .onNoMatch(.perform(action: view.customHandler))
+            .onNoMatch(.perform(action: view.customHandler))
+        
+        XCTAssertTrue(handler.handle(error: HandlerError1.error1, onHandled: nil))
+        
+        XCTAssertTrue(view.didHandleResult())
+    }
+    
 }
 
 extension ErrorHandlerTests {
@@ -87,6 +123,9 @@ extension ErrorHandlerTests {
         ("testItCantHandleSpecificErrorsWhereThereAreNoSpecificHandlers", testItCantHandleSpecificErrorsWhereThereAreNoSpecificHandlers),
         ("testItCanFallbackToADefaultHandler", testItCanFallbackToADefaultHandler),
         ("testItPrefersASpecficHandlerAboveTheDefaultHandler", testItPrefersASpecficHandlerAboveTheDefaultHandler),
-        ("testItPrefersTheFirstMatchedHandler", testItPrefersTheFirstMatchedHandler)
+        ("testItCanExecuteMultupleMatches", testItCanExecuteMultupleMatches),
+        ("testItCanHaveHandlersThatAlwaysGetExecuted", testItCanHaveHandlersThatAlwaysGetExecuted),
+        ("testItCanHaveMultipleAlwaysHandlers", testItCanHaveMultipleAlwaysHandlers),
+        ("testItCanHaveMultipleDefaultHandlers", testItCanHaveMultipleDefaultHandlers)
     ]
 }

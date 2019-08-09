@@ -11,9 +11,10 @@ import Foundation
 extension DispatchGroup {
     class func enter(number: Int) -> DispatchGroup {
         let group = DispatchGroup()
-        for _ in 1...number {
-            print("ENTER")
-            group.enter()
+        if number > 0 {
+            for _ in 1...number {
+                group.enter()
+            }
         }
         return group
     }

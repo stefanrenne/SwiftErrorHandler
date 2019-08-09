@@ -14,90 +14,98 @@ class ErrorMatcherTests: XCTestCase {
     func testItCanMatchError() throws {
         
         let matchers: [(ErrorMatcher, ActionHandler)] = [
-            (ErrorMatcher.isEqual(to: MatcherError1.error2), ActionHandler.perform(action: { (_, _) in return false })),
-            (ErrorMatcher.isEqual(to: MatcherError2.error4), ActionHandler.perform(action: { (_, _) in return false })),
-            (ErrorMatcher.isEqual(to: MatcherError1.error1), ActionHandler.perform(action: { (_, _) in return true }))
+            (ErrorMatcher.type(MatcherError1.error2), ActionHandler.perform(action: { (_, _) in XCTFail("Incorrect Handler executed") })),
+            (ErrorMatcher.type(MatcherError2.error4), ActionHandler.perform(action: { (_, _) in XCTFail("Incorrect Handler executed") })),
+            (ErrorMatcher.type(MatcherError1.error1), ActionHandler.perform(action: { (_, _) in }))
         ]
         
         let searchError = MatcherError1.error1
         
         // Find the validator for this error
-        guard let actionHandler = matchers.firstAction(for: searchError),
+        let actionHandlers = matchers.actions(for: searchError)
+        guard actionHandlers.count == 1,
+            let actionHandler = actionHandlers.first,
             case ActionHandler.perform(action: let handler) = actionHandler else {
             XCTFail("Couldn't find action handler for MatcherError1.error1")
             return
         }
         
-        //Validate if this handler returns true
-        XCTAssertTrue(handler(searchError, nil))
+        // Validate if the correct handler is executed
+        handler(searchError, nil)
     }
     
     func testItCanMatchErrorCodes() throws {
         
         let matchers: [(ErrorMatcher, ActionHandler)] = [
-            (ErrorMatcher.isEqual(to: MatcherError1.error2), ActionHandler.perform(action: { (_, _) in return false })),
-            (ErrorMatcher.isEqual(to: MatcherError2.error4), ActionHandler.perform(action: { (_, _) in return false })),
-            (ErrorMatcher.has(code: 404), .perform(action: { (_, _) in return false })),
-            (ErrorMatcher.has(code: 400), .perform(action: { (_, _) in return true })),
-            (ErrorMatcher.isEqual(to: MatcherError1.error1), ActionHandler.perform(action: { (_, _) in return false }))
+            (ErrorMatcher.type(MatcherError1.error2), ActionHandler.perform(action: { (_, _) in XCTFail("Incorrect Handler executed") })),
+            (ErrorMatcher.type(MatcherError2.error4), ActionHandler.perform(action: { (_, _) in XCTFail("Incorrect Handler executed") })),
+            (ErrorMatcher.code(404), .perform(action: { (_, _) in XCTFail("Incorrect Handler executed") })),
+            (ErrorMatcher.code(400), .perform(action: { (_, _) in })),
+            (ErrorMatcher.type(MatcherError1.error1), ActionHandler.perform(action: { (_, _) in XCTFail("Incorrect Handler executed") }))
         ]
         
         let searchError = NSError(domain: "damain", code: 400, userInfo: ["data": "value"])
         
         // Find the validator for this error
-        guard let actionHandler = matchers.firstAction(for: searchError),
+        let actionHandlers = matchers.actions(for: searchError)
+        guard actionHandlers.count == 1,
+            let actionHandler = actionHandlers.first,
             case ActionHandler.perform(action: let handler) = actionHandler else {
                 XCTFail("Couldn't find action handler for error code 400")
                 return
         }
         
-        //Validate if this handler returns true
-        XCTAssertTrue(handler(searchError, nil))
+        // Validate if the correct handler is executed
+        handler(searchError, nil)
         
     }
     
     func testItCanMatchWithBlock() throws {
         
         let matchers: [(ErrorMatcher, ActionHandler)] = [
-            (ErrorMatcher.isEqual(to: MatcherError1.error2), ActionHandler.perform(action: { (_, _) in return false })),
-            (ErrorMatcher.has(code: 404), .perform(action: { (_, _) in return false })),
-            (ErrorMatcher.matches({ error in
+            (ErrorMatcher.type(MatcherError1.error2), ActionHandler.perform(action: { (_, _) in XCTFail("Incorrect Handler executed") })),
+            (ErrorMatcher.code(404), .perform(action: { (_, _) in XCTFail("Incorrect Handler executed") })),
+            (ErrorMatcher.match({ error in
                 guard let testError = error as? MatcherError1, testError == .error3 else { return true }
                 return true
-            }), ActionHandler.perform(action: { (_, _) in return true }))
+            }), ActionHandler.perform(action: { (_, _) in }))
         ]
         
         let searchError = MatcherError1.error3
         
         // Find the validator for this error
-        guard let actionHandler = matchers.firstAction(for: searchError),
+        let actionHandlers = matchers.actions(for: searchError)
+        guard actionHandlers.count == 1,
+            let actionHandler = actionHandlers.first,
             case ActionHandler.perform(action: let handler) = actionHandler else {
                 XCTFail("Couldn't find action handler for MatcherError1.error3")
                 return
         }
         
-        //Validate if this handler returns true
-        XCTAssertTrue(handler(searchError, nil))
+        // Validate if the correct handler is executed
+        handler(searchError, nil)
         
     }
     
     func testItCanMatchCompleteErrorSuites() throws {
         
         let matchers: [(ErrorMatcher, ActionHandler)] = [
-            (ErrorMatcher.matches({ $0 is MatcherError2 }), ActionHandler.perform(action: { (_, _) in return true }))
+            (ErrorMatcher.match({ $0 is MatcherError2 }), ActionHandler.perform(action: { (_, _) in }))
         ]
         
         let searchError = MatcherError2.error4
         
         // Find the validator for this error
-        guard let actionHandler = matchers.firstAction(for: searchError),
+        let actionHandlers = matchers.actions(for: searchError)
+        guard actionHandlers.count == 1,
+            let actionHandler = actionHandlers.first,
             case ActionHandler.perform(action: let handler) = actionHandler else {
                 XCTFail("Couldn't find action handler for MatcherError2")
                 return
         }
         
-        //Validate if this handler returns true
-        XCTAssertTrue(handler(searchError, nil))
+        // Validate if the correct handler is executed
+        handler(searchError, nil)
     }
 }
 

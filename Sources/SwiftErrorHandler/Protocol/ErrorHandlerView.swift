@@ -8,8 +8,12 @@
 
 import UIKit
 
-extension UIViewController: ErrorHandlerView { }
-
 public protocol ErrorHandlerView {
-    func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)?)
+    func present(alert: UIAlertController)
+}
+
+extension UIViewController: ErrorHandlerView {
+    public func present(alert: UIAlertController) {
+        present(alert, animated: true, completion: nil)
+    }
 }

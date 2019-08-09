@@ -9,25 +9,24 @@
 import Foundation
 
 public enum ErrorMatcher {
-    case isEqual(to: Error)
-    case has(code: Int)
-    case matches((Error) -> Bool)
+    case type(Error)
+    case code(Int)
+    case match((Error) -> Bool)
 }
 
 extension Array where Element == (ErrorMatcher, ActionHandler) {
-    func firstAction(for error: Error) -> ActionHandler? {
-        for (onError, action) in self {
+    func actions(for error: Error) -> [ActionHandler] {
+        return compactMap { (onError, action) -> ActionHandler? in
             switch onError {
-            case .has(let code) where code == error._code:
+            case .code(let code) where code == error._code:
                 return action
-            case .isEqual(let matcher) where matcher.reflectedString == error.reflectedString:
+            case .type(let matcher) where matcher.reflectedString == error.reflectedString:
                 return action
-            case .matches(let matcher) where matcher(error):
+            case .match(let matcher) where matcher(error):
                 return action
             default:
-                continue
+                return nil
             }
         }
-        return nil
     }
 }

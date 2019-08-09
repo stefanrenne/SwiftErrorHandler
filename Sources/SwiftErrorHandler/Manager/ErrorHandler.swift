@@ -18,7 +18,8 @@ open class ErrorHandler {
     }
     
     private var specificErrorActions = [(ErrorMatcher, ActionHandler)]()
-    private var defaultAction: ActionHandler?
+    private var alwaysActions = [ActionHandler]()
+    private var defaultActions = [ActionHandler]()
     
     /// adds an error handler for a specific error to the ErrorHandler
     ///
@@ -27,21 +28,31 @@ open class ErrorHandler {
     ///   - then action: The action that needs to be performed when the error matches
     /// - Returns: an instance of self (for chaining purposes)
     @discardableResult
-    public func `if`(error errors: ErrorMatcher..., then action: ActionHandler) -> ErrorHandler {
+    public func on(error errors: ErrorMatcher..., then action: ActionHandler) -> ErrorHandler {
         errors.forEach { (error) in
-            self.specificErrorActions.append((error, action))
+            specificErrorActions.append((error, action))
         }
         return self
     }
-    
     /// adds a default error handler to the ErrorHandler
     ///
     /// - Parameters:
-    ///   - then action: the catch-all action that needs to be performed when no other match can be found
+    ///   - action: the catch-all action that needs to be performed when no other match can be found
     /// - Returns: an instance of self (for chaining purposes)
     @discardableResult
-    public func `else`(then action: ActionHandler) -> ErrorHandler {
-        self.defaultAction = action
+    public func onNoMatch(_ action: ActionHandler) -> ErrorHandler {
+        defaultActions.append(action)
+        return self
+    }
+    
+    /// adds a error handler that will be executed on every error
+    ///
+    /// - Parameters:
+    ///   - action: The action that always needs to be performed
+    /// - Returns: an instance of self (for chaining purposes)
+    @discardableResult
+    public func always(_ action: ActionHandler) -> ErrorHandler {
+        alwaysActions.append(action)
         return self
     }
     
@@ -53,22 +64,37 @@ open class ErrorHandler {
     @discardableResult
     public func handle(error: Error, onHandled: OnErrorHandled) -> Bool {
         
-        var handled = false
-        
         // Check if we have a handler for this error:
-        if let action = specificErrorActions.firstAction(for: error) {
-            handled = action.perform(on: view, for: error, onHandled: onHandled)
+        let specificErrorHandlers: [ActionHandler] = specificErrorActions.actions(for: error)
+        
+        let actions: [ActionHandler]
+        if specificErrorHandlers.count > 0 {
+            actions = specificErrorHandlers + alwaysActions
+        } else {
+            actions = defaultActions + alwaysActions
         }
         
-        // use the default handler if present
-        if !handled, let defaultAction = defaultAction {
-            handled = defaultAction.perform(on: view, for: error, onHandled: onHandled)
-        }
+        // Chain the on completion actions to trigger the next error handler
+        let chainedActions = actions
+            .reversed()
+            .reduce(into: [() -> Void]()) { (result, action) in
+                let previousAction = result.last ?? onHandled
+                let actionRow = action.perform(on: view, for: error, onHandled: previousAction)
+                result.append(actionRow)
+            }
+            .reversed()
         
-        // If the error is still unhandled -> Log it
+        // Perform First Action
+        chainedActions.first?()
+        
+        let handled = chainedActions.count > 0
+        
+        #if DEBUG
         if !handled {
-            print("unhandled error: \(error.localizedDescription)")
+            // If the error is still unhandled -> Log it
+            print("Unhandled error: \(error.localizedDescription)")
         }
+        #endif
         
         return handled
     }

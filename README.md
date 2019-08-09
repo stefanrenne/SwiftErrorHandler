@@ -45,10 +45,11 @@ The default ErrorHandler will contain the error handling logic that is common ac
 extension ErrorHandler {
   class func `default`(for view: ErrorHandlerView) -> ErrorHandler {
     return ErrorHandler(for: view)
-      .if(error: .has(code: NSURLErrorTimedOut), then: .present(alert: ConfirmableAlert(title: "Timeout occurred", confirmTitle: "Retry", confirmAction: { error in print("retry network call") })))
-      .if(error: .isEqual(to: CustomError.noInternet), then: .present(alert: ConfirmableAlert(title: "Did you turn off the internet?", confirmTitle: "No")))
-      .if(error: .isEqual(to: CustomError.logout), then: .present(alert: RejectableAlert(title: "Are you sure you want to logout?", confirmTitle: "Yes", rejectTitle: "No")))
-      .else(then: .present(alert: ConfirmableAlert(title: "Something went wrong", confirmTitle: "Ok")))
+      .on(error: .code(NSURLErrorTimedOut), then: .present(alert: ConfirmableAlert(title: "Timeout occurred", confirmTitle: "Retry", confirmAction: { error in print("retry network call") })))
+      .on(error: .type(CustomError.noInternet), then: .present(alert: ConfirmableAlert(title: "Did you turn off the internet?", confirmTitle: "No")))
+      .on(error: .type(CustomError.logout), then: .present(alert: RejectableAlert(title: "Are you sure you want to logout?", confirmTitle: "Yes", rejectTitle: "No")))
+      .always(.perform(action: logErrorToAnalytics))
+      .onNoMatch(.present(alert: ConfirmableAlert(title: "Something went wrong", confirmTitle: "Ok")))
     }
 }
 ```
@@ -56,7 +57,16 @@ extension ErrorHandler {
 The only required attribute is a view to present alerts on, by default all UIViewControllers conform to the ErrorHandlerView protocol. But if in your implemented architecture a different class is resposible for presenting views it is very easy to conform to this protocol.
 
 ```swift
-extension UIViewController: ErrorHandlerView { }
+public protocol ErrorHandlerView {
+  func present(alert: UIAlertController)
+}
+
+extension UIViewController: ErrorHandlerView {
+  public func present(alert: UIAlertController) {
+    present(alert, animated: true, completion: nil)
+  }
+}
+
 ```
 
 
@@ -83,7 +93,7 @@ For example in a LoginViewController
 class LoginViewController: UIViewController {
     
   private lazy var errorHandler = ErrorHandler.default(for: self)
-    .if(error: .isEqual(to: CustomError.authenticate), then: .perform(action: startAuthentication))
+    .on(error: .type(CustomError.authenticate), then: .perform(action: startAuthentication))
         
   func performLogin() {
     do {
@@ -109,7 +119,7 @@ class LoginViewController: UIViewController {
   private let disposeBag = DisposeBag()
     
   private lazy var errorHandler = ErrorHandler.default(for: self)
-    .if(error: .isEqual(to: CustomError.authenticate), then: .perform(action: startAuthentication))
+    .on(error: .type(CustomError.authenticate), then: .perform(action: startAuthentication))
         
   func performLogin() {
     
@@ -156,9 +166,11 @@ When designing for errors, we usually need to:
 // i.e. network, db errors etc.
 2. handle **specific** errors **in a custom manner** given **the context**  of where and when they occur
 // i.e. network error while uploading a file, invalid login
-3. have a **catch-all** handler for **unknown** errors
+3. have **unspecific** handlers that get executed on every error
+// i.e. log errors to Fabric or any other analytics service
+4. have a **catch-all** handler for **unknown** errors
 // i.e. errors we don't have custom handling for
-4. keep our code **DRY**
+5. keep our code **DRY**
 
 Swift's has a very well thought error handling model keeping balance between convenience ([automatic propagation](https://github.com/apple/swift/blob/master/docs/ErrorHandlingRationale.rst#automatic-propagation)) and clarity-safety ([Typed propagation](https://github.com/apple/swift/blob/master/docs/ErrorHandlingRationale.rst#id3), [Marked propagation](https://github.com/apple/swift/blob/master/docs/ErrorHandlingRationale.rst#id4)). As a result, the compiler serves as a reminder of errors that need to be handled and at the same type it is relatively easy to propagate errors and handle them higher up the stack.
 

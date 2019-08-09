@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias CustomActionHandler = (_ error: Error, _ onHandled: OnErrorHandled) -> Bool
+public typealias CustomActionHandler = (_ error: Error, _ onHandled: OnErrorHandled) -> Void
 
 public enum ActionHandler {
     case doNothing
@@ -17,17 +17,15 @@ public enum ActionHandler {
 }
 
 extension ActionHandler {
-    func perform(on view: ErrorHandlerView, for error: Error, onHandled: OnErrorHandled) -> Bool {
+    func perform(on view: ErrorHandlerView, for error: Error, onHandled: OnErrorHandled) -> () -> Void {
         switch self {
         case .doNothing:
-            onHandled?()
-            return true
+            return { onHandled?() }
         case .present(let alert):
             let alertController = alert.build(for: error, onHandled: onHandled)
-            view.present(alertController, animated: true, completion: nil)
-            return true
+            return { view.present(alert: alertController) }
         case .perform(let action):
-            return action(error, onHandled)
+            return { action(error, onHandled) }
         }
     }
 }

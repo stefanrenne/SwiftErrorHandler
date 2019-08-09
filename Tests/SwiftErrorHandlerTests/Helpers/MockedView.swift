@@ -7,34 +7,44 @@
 //
 
 import UIKit
+import XCTest
 @testable import SwiftErrorHandler
 
 class MockedView: ErrorHandlerView {
     
-    let group: DispatchGroup
-    var lastResult: UIViewController?
+    private let presentedAlertsGroups: DispatchGroup
+    private let customHandlersGroup: DispatchGroup
+    private let onHandledGroups: DispatchGroup
+    var lastResult: UIAlertController?
     
-    init(numberExpectedResults: Int) {
-        group = DispatchGroup.enter(number: numberExpectedResults)
+    init(numberExpectedPresentedAlerts: Int, numberExpectedCustomHandlers: Int, numberExpectedOnHandled: Int) {
+        presentedAlertsGroups = DispatchGroup.enter(number: numberExpectedPresentedAlerts)
+        customHandlersGroup = DispatchGroup.enter(number: numberExpectedCustomHandlers)
+        onHandledGroups = DispatchGroup.enter(number: numberExpectedOnHandled)
     }
     
-    func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)?) {
-        lastResult = viewControllerToPresent
-        group.leave()
-        completion?()
+    func present(alert: UIAlertController) {
+        lastResult = alert
+        presentedAlertsGroups.leave()
     }
     
     func onHandled() {
-        group.leave()
+        onHandledGroups.leave()
     }
     
-    func customHandler(for error: Error, onHandled: OnErrorHandled) -> Bool {
-        group.leave()
+    func unexpectedHandlerExecuted(for error: Error, onHandled: OnErrorHandled) {
+        XCTFail("Unexpected Handler Executed")
+    }
+    
+    func customHandler(for error: Error, onHandled: OnErrorHandled) {
+        customHandlersGroup.leave()
         onHandled?()
-        return true
     }
     
     func didHandleResult() -> Bool {
-        return group.wait(timeout: .now() + .milliseconds(200)) == .success
+        let timeout: DispatchTime = .now() + .milliseconds(200)
+        return presentedAlertsGroups.wait(timeout: timeout) == .success &&
+               customHandlersGroup.wait(timeout: timeout) == .success &&
+               onHandledGroups.wait(timeout: timeout) == .success
     }
 }
