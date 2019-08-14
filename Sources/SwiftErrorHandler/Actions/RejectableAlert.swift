@@ -6,7 +6,6 @@
 //  Copyright © 2019 stefanrenne. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
 public struct RejectableAlert: ErrorAlert {

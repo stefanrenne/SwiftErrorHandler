@@ -89,13 +89,6 @@ open class ErrorHandler {
         
         let handled = chainedActions.count > 0
         
-        #if DEBUG
-        if !handled {
-            // If the error is still unhandled -> Log it
-            print("Unhandled error: \(error.localizedDescription)")
-        }
-        #endif
-        
         return handled
     }
     

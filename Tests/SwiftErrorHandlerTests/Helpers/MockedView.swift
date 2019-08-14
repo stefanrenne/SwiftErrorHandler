@@ -6,7 +6,6 @@
 //  Copyright © 2019 stefanrenne. All rights reserved.
 //
 
-import UIKit
 import XCTest
 @testable import SwiftErrorHandler
 
