@@ -33,7 +33,7 @@ let package = Package(
 
 ## Usage
 
-Let's say we're building a account based iOS app that can throw errors in the networking layer and using local validation.
+Let's say we're building a account based iOS app that can throw errors in the networking layer.
 
 We need to:
 
@@ -62,7 +62,7 @@ Often the cases the default handler knows about will be good enough.
 do {
   try saveStatus()
 } catch {
-  ErrorHandler.default.handle(error: error)
+  ErrorHandler.default(for: self).handle(error: error)
 }
 ```
 
@@ -98,12 +98,13 @@ class LoginViewController: UIViewController {
 ### Bonus: RxSwift Support
 
 ```swift
+let errorHandler = ErrorHandler.default(for: self)
 Observable<User>
   .error(NetworkError.authenticate)
   .subscribe(onNext: { result in
       print("User loggedin")
     },
-    onError: ErrorHandler.default.handle)
+    onError: errorHandler.handle)
   .disposed(by: disposeBag)
 ```
 
@@ -112,12 +113,15 @@ Observable<User>
 ### The way actions can be performed for errors
 
 - Performs actions for specific errors
+
 	`errorHandler.on(error: .code(404), then: .present(Alert))`
 
 - Performs actions when no specific error matcher can be found 
+
 	`errorHandler.onNoMatch(.present(Alert))`
 
 - Actions that need to be performed for all errors
+
 	`errorHandler.always(.perform(action: analyticsService.track))`
 
 
