@@ -39,7 +39,7 @@ We need to:
 
 ### Setup a default ErrorHandler once
 
-The default ErrorHandler will contain the error handling logic that is common across your application and you don't want to duplicate. You can create a factory that creates it so that you can get new instance with the common handling logic from anywhere in your app.
+The default ErrorHandler will contain the error handling logic that is common across your application that you don't want to duplicate. You can create a factory that creates it so that you can get new instance with common handling logic from anywhere in your app.
 
 ```swift
 extension ErrorHandler {
@@ -110,7 +110,7 @@ Observable<User>
 
 ## Customization options
 
-### The way actions can be performed for errors
+### The way actions are performed for errors
 
 - Performs actions for specific errors
 
@@ -152,7 +152,7 @@ Observable<User>
 
 #### Do nothing
 
-It mainly exists to make documentation & unit tests to understand.
+It mainly exists to make documentation & unit tests easier to understand.
 
 `.on(error: .code(404), then: .doNothing)`
 
@@ -163,7 +163,7 @@ The Alert is presented on the View provided in the ErrorHandler init
 
 `.on(error: .code(404), then: .present(alert: ErrorAlert))`
 
-By default there are two alert types that you can present:
+By default there are two alert types you can present:
 
 - **ConfirmableAlert**: An alert with one action button
 - **RejectableAlert**: An alert with two action buttons
@@ -186,7 +186,7 @@ The **CustomActionHandler** provides the `Error` and an optional `onCompleted` c
 
 #### Implementing the ErrorHandler outside the ViewController
 
-In larger apps it makes sense to implement the ErrorHandler in a different class then the ViewController, to make this work you need to provide a view on which alerts can be presented, this can be done by conforming to the ErrorHandlerView protocol.
+In larger apps it makes sense to implement the ErrorHandler in a different class than the ViewController. To make this work you need to provide a view on which alerts can be presented. This can be done by conforming to the ErrorHandlerView protocol.
 
 ```swift
 public protocol ErrorHandlerView {
@@ -204,7 +204,7 @@ extension UIViewController: ErrorHandlerView {
 
 ## Contribute?
 
-**Build your xcode project using the swift package manager**
+**Build your xcode project using the Swift Package Manager**
  
 ```
 swift package generate-xcodeproj --xcconfig-overrides ./Sources/ios.xcconfig
@@ -213,7 +213,7 @@ swift package generate-xcodeproj --xcconfig-overrides ./Sources/ios.xcconfig
 
 **Quick checklist summary before submitting a PR**
 
-- 🔎 Make sure tests are added or updated to accomodate your changes. We do not accept any addition that come without tests. When possible, add tests to verify bug fixes and prevent future regressions.
+- 🔎 Make sure tests are added or updated to accomodate your changes. We do not accept any addition that comes without tests. When possible, add tests to verify bug fixes and prevent future regressions.
 - 📖 Check that you provided a CHANGELOG entry documenting your changes (except for documentation improvements)
 - 👌 Verify that tests pass
 - 👍 Push it!
@@ -226,15 +226,15 @@ When designing for errors, we usually need to:
 1. have a **default** handler for **expected** errors
 // i.e. network, db errors etc.
 2. handle **specific** errors **in a custom manner** given **the context**  of where and when they occur
-// i.e. network error while uploading a file, invalid login
+// i.e. a network error while uploading a file, invalid login
 3. have **unspecific** handlers that get executed on every error
 // i.e. log errors to Fabric or any other analytics service
 4. have a **catch-all** handler for **unknown** errors
 // i.e. errors we don't have custom handling for
 5. keep our code **DRY**
 
-Swift's has a very well thought error handling model keeping balance between convenience ([automatic propagation](https://github.com/apple/swift/blob/master/docs/ErrorHandlingRationale.rst#automatic-propagation)) and clarity-safety ([Typed propagation](https://github.com/apple/swift/blob/master/docs/ErrorHandlingRationale.rst#id3), [Marked propagation](https://github.com/apple/swift/blob/master/docs/ErrorHandlingRationale.rst#id4)). As a result, the compiler serves as a reminder of errors that need to be handled and at the same type it is relatively easy to propagate errors and handle them higher up the stack.
+Swift has a well thought error handling model that balances between convenience ([automatic propagation](https://github.com/apple/swift/blob/master/docs/ErrorHandlingRationale.rst#automatic-propagation)) and clarity-safety ([Typed propagation](https://github.com/apple/swift/blob/master/docs/ErrorHandlingRationale.rst#id3), [Marked propagation](https://github.com/apple/swift/blob/master/docs/ErrorHandlingRationale.rst#id4)). As a result, the compiler warns of errors that need to be handled, while making it relatively easy to propagate errors and handle them higher up the stack.
 
-However, even with this help from the language, achieving the goals listed above in an **ad-hoc** manner in an application of a reasonable size can lead to a lot of **boilerplate** which is **tedious** to write and reason about. Because of this friction developers quite often choose to swallow errors or handle them all in the same generic way.
+However, even with this help from the language, achieving the goals listed above in an **ad-hoc** manner in an application of a reasonable size can lead to a lot of **boilerplate** which is **tedious** to write and reason about. Because of this friction, developers quite often choose to swallow errors or handle them all in the same generic way.
 
-This library addresses these issues by providing an abstraction over defining flexible error handling rules with an opinionated fluent API.
+This library addresses these issues by providing an abstraction to define flexible error handling rules with an opinionated, fluent API.
