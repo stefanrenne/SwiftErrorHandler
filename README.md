@@ -2,6 +2,8 @@
 
 [![Swift 5.0](https://img.shields.io/badge/swift-5.0-orange.svg?style=flat)](https://swift.org)
 [![Travis Status](https://travis-ci.org/stefanrenne/SwiftErrorHandler.svg?branch=master)](https://travis-ci.org/stefanrenne/SwiftErrorHandler)
+[![Maintainability](https://api.codeclimate.com/v1/badges/13a3613bc81ed631e9e2/maintainability)](https://codeclimate.com/github/stefanrenne/SwiftErrorHandler/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/13a3613bc81ed631e9e2/test_coverage)](https://codeclimate.com/github/stefanrenne/SwiftErrorHandler/test_coverage)
 [![CocoaPods Version Badge](https://img.shields.io/cocoapods/v/SwiftErrorHandler.svg)](https://cocoapods.org/pods/SwiftErrorHandler)
 [![License Badge](https://img.shields.io/cocoapods/l/SwiftErrorHandler.svg)](LICENSE)
 [![Platform](https://img.shields.io/cocoapods/p/SwiftErrorHandler.svg?style=flat)](http://cocoapods.org/pods/SwiftErrorHandler)
