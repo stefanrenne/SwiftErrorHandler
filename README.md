@@ -4,6 +4,7 @@
 [![Travis Status](https://travis-ci.org/stefanrenne/SwiftErrorHandler.svg?branch=master)](https://travis-ci.org/stefanrenne/SwiftErrorHandler)
 [![Maintainability](https://api.codeclimate.com/v1/badges/13a3613bc81ed631e9e2/maintainability)](https://codeclimate.com/github/stefanrenne/SwiftErrorHandler/maintainability)
 [![CocoaPods Version Badge](https://img.shields.io/cocoapods/v/SwiftErrorHandler.svg)](https://cocoapods.org/pods/SwiftErrorHandler)
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![License Badge](https://img.shields.io/cocoapods/l/SwiftErrorHandler.svg)](LICENSE)
 [![Platform](https://img.shields.io/cocoapods/p/SwiftErrorHandler.svg?style=flat)](http://cocoapods.org/pods/SwiftErrorHandler)
 
@@ -16,6 +17,12 @@ SwiftErrorHandler enables expressing complex error handling logic with a few lin
 
 ```
 pod 'SwiftErrorHandler', '~> 5.0'
+```
+
+### Carthage
+
+```
+github "stefanrenne/SwiftErrorHandler" ~> 5.0
 ```
 
 ### Swift Package Manager (SPM)

@@ -38,5 +38,19 @@ jobs:
         - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
     - stage: deploy
       if: tag IS present
-      script:
+      before_deploy:
+        - brew update
+        - brew outdated carthage || brew upgrade carthage
         - pod trunk push --allow-warnings
+        - swift package generate-xcodeproj --xcconfig-overrides ./Sources/ios.xcconfig
+        - carthage version
+        - carthage build --no-skip-current
+        - carthage archive SwiftErrorHandler
+      deploy:
+        provider: releases
+        api_key: $GITHUB_OAUTH_TOKEN
+        file: SwiftErrorHandler.framework.zip
+        skip_cleanup: true
+        on:
+          repo: stefanrenne/SwiftErrorHandler
+          tags: true

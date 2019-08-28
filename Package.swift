@@ -9,6 +9,7 @@ let package = Package(
     products: [
         .library(
             name: "SwiftErrorHandler",
+            type: .static,
             targets: ["SwiftErrorHandler"])
     ],
     dependencies: [],
