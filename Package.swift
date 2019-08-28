@@ -9,7 +9,7 @@ let package = Package(
     products: [
         .library(
             name: "SwiftErrorHandler",
-            targets: ["SwiftErrorHandler"]),
+            targets: ["SwiftErrorHandler"])
     ],
     dependencies: [],
     targets: [
@@ -18,7 +18,7 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "SwiftErrorHandlerTests",
-            dependencies: ["SwiftErrorHandler"]),
+            dependencies: ["SwiftErrorHandler"])
     ],
     swiftLanguageVersions: [.v5]
 )
