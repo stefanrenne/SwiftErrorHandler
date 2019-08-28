@@ -11,7 +11,7 @@ env:
     - EXPANDED_CODE_SIGN_IDENTITY_NAME=""
     - EXPANDED_PROVISIONING_PROFILE=""
     - DESTINATION="platform=iOS Simulator,name=iPhone XS"
-  
+    - CC_TEST_REPORTER_ID=f9052cf7f98bd46742d8f3f5d140a053f8cfb4031046eb238d1e5de9b460ac6b
 install:
   - git config --add diff.renamelimit 0
 
@@ -24,6 +24,9 @@ jobs:
     - stage: test
       before_script:
         - gem install slather
+        - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-darwin-amd64 > ./cc-test-reporter
+        - chmod +x ./cc-test-reporter
+        - ./cc-test-reporter before-build
       script:
         - set -o pipefail
         - xcodebuild -version
@@ -32,6 +35,7 @@ jobs:
         - xcodebuild -project "$PROJECT" -scheme "$SCHEME" -destination "$DESTINATION" -enableCodeCoverage YES clean build test | xcpretty
       after_script:
         - slather
+        - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
     - stage: deploy
       if: tag IS present
       script:
