@@ -37,7 +37,7 @@ jobs:
     #     - slather
     #     - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
     - stage: deploy
-      if: tag IS present
+      # if: tag IS present
       before_deploy:
         - swift package generate-xcodeproj --xcconfig-overrides ./Sources/ios.xcconfig
         - carthage version
