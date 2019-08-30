@@ -17,27 +17,27 @@ install:
 
 jobs:
   include:
-    # - stage: lint
-    #   script:
-    #     - swiftlint
-    #     - pod lib lint
-    # - stage: test
-    #   before_script:
-    #     - gem install slather
-    #     - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-darwin-amd64 > ./cc-test-reporter
-    #     - chmod +x ./cc-test-reporter
-    #     - ./cc-test-reporter before-build
-    #   script:
-    #     - set -o pipefail
-    #     - xcodebuild -version
-    #     - xcodebuild -showsdks
-    #     - swift package generate-xcodeproj --xcconfig-overrides ./Sources/ios.xcconfig
-    #     - xcodebuild -project "$PROJECT" -scheme "$SCHEME" -destination "$DESTINATION" -enableCodeCoverage YES clean build test | xcpretty
-    #   after_script:
-    #     - slather
-    #     - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+    - stage: lint
+      script:
+        - swiftlint
+        - pod lib lint
+    - stage: test
+      before_script:
+        - gem install slather
+        - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-darwin-amd64 > ./cc-test-reporter
+        - chmod +x ./cc-test-reporter
+        - ./cc-test-reporter before-build
+      script:
+        - set -o pipefail
+        - xcodebuild -version
+        - xcodebuild -showsdks
+        - swift package generate-xcodeproj --xcconfig-overrides ./Sources/ios.xcconfig
+        - xcodebuild -project "$PROJECT" -scheme "$SCHEME" -destination "$DESTINATION" -enableCodeCoverage YES clean build test | xcpretty
+      after_script:
+        - slather
+        - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
     - stage: deploy
-      # if: tag IS present
+      if: tag IS present
       script:
         - swift package generate-xcodeproj --xcconfig-overrides ./Sources/ios.xcconfig
         - carthage version
@@ -46,12 +46,12 @@ jobs:
       deploy:
         - provider: releases
           api_key:
-           secure: lYOBEL27WJ8OG8L+IFXLZFrYYAxdPReq6NS1p8nwZs7O6Oc+namqbEp31fBl5XJLpCiq33DiCHLAQHEK7UTavGuvINADgPRlRn45Ieyd+CF8EAVsbK1cYS6+bXXt6RLcrBOS9wrGbpFt18HE1QdVrPtOztRjSvaCf+jMiS4jv1R8HOmWsy4Lxf6UtpPhcpwNqQ4aBt2C61Uwbt406pqVoxIZj/berN2i495LO52/S2eu+4E8wjoeaJSQKZgmMFNoZMpbwIrZIC0ShXRGTjyV/TuY2BSJucCXtxXtsxwF+JgGW+a8UyeMxltLv19DWyfMi2p+xttkZM7LgIFXPEj0+3DZeCwa3rHw/EWuqzXUsnBddZEyh6J9pc4i5ZlVI+uBmbbc0KxZsdSncRl6XL5cr3IHdlDCskqHSEYmW56qnhCqyGSyOZfn1QzM/1SsQIDQZ0S++VoHUEKrD+hhgY9ss7Ecc+cwEITGOGiLuLy6JEJtERTR5c0ovc6Sp/134sYHSeyX3OBvCBnoAPLqfdLtPX35Z5kSjSFuCLNnFY4oVDo1Ye57ypMUICu13WE2iiBPhUmQsJrJnWsy6aqes2OqFFM0tbMi8zu11EOQNSWIGWVWhW8On+7gnIiTiS8+vwAUM++dO/bcLFWZ2ixwt4djuF5lSl6Fh6UK1ow6JSjQFio=
+            secure: lYOBEL27WJ8OG8L+IFXLZFrYYAxdPReq6NS1p8nwZs7O6Oc+namqbEp31fBl5XJLpCiq33DiCHLAQHEK7UTavGuvINADgPRlRn45Ieyd+CF8EAVsbK1cYS6+bXXt6RLcrBOS9wrGbpFt18HE1QdVrPtOztRjSvaCf+jMiS4jv1R8HOmWsy4Lxf6UtpPhcpwNqQ4aBt2C61Uwbt406pqVoxIZj/berN2i495LO52/S2eu+4E8wjoeaJSQKZgmMFNoZMpbwIrZIC0ShXRGTjyV/TuY2BSJucCXtxXtsxwF+JgGW+a8UyeMxltLv19DWyfMi2p+xttkZM7LgIFXPEj0+3DZeCwa3rHw/EWuqzXUsnBddZEyh6J9pc4i5ZlVI+uBmbbc0KxZsdSncRl6XL5cr3IHdlDCskqHSEYmW56qnhCqyGSyOZfn1QzM/1SsQIDQZ0S++VoHUEKrD+hhgY9ss7Ecc+cwEITGOGiLuLy6JEJtERTR5c0ovc6Sp/134sYHSeyX3OBvCBnoAPLqfdLtPX35Z5kSjSFuCLNnFY4oVDo1Ye57ypMUICu13WE2iiBPhUmQsJrJnWsy6aqes2OqFFM0tbMi8zu11EOQNSWIGWVWhW8On+7gnIiTiS8+vwAUM++dO/bcLFWZ2ixwt4djuF5lSl6Fh6UK1ow6JSjQFio=
           file: SwiftErrorHandler.framework.zip
-#          on:
-#            tags: true
-#        - provider: script
-#          script: 
-#            - pod trunk push --allow-warnings
-#          on:
-#            tags: true
+          on:
+            tags: true
+        - provider: script
+          script: 
+            - pod trunk push --allow-warnings
+          on:
+            tags: true

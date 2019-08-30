@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ---
+## [5.0.2](https://github.com/stefanrenne/SwiftErrorHandler/releases/tag/5.0.2)
+
+* Added Carthage support
+
 ## [5.0.1](https://github.com/stefanrenne/SwiftErrorHandler/releases/tag/5.0.1)
 
 * Introduces `always` to perform actions for all errors
