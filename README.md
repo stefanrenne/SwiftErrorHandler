@@ -116,6 +116,16 @@ Observable<User>
   .disposed(by: disposeBag)
 ```
 
+
+### Bonus: Result Support
+
+```swift
+let errorHandler = ErrorHandler.default(for: self)
+let result: Result<User, NetworkError> = .failure(NetworkError.authenticate)
+let user: User? = result.get(onError: errorHandler)
+```
+
+
 ## Customization options
 
 ### The way actions are performed for errors
