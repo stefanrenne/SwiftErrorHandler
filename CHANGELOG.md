@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 ---
+## [5.0.3](https://github.com/stefanrenne/SwiftErrorHandler/releases/tag/5.0.3)
+
+* Added Swift Result extension for error handling
+* Refactored matcher logic
+
 ## [5.0.2](https://github.com/stefanrenne/SwiftErrorHandler/releases/tag/5.0.2)
 
 * Added Carthage support
