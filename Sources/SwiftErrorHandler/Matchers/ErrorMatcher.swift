@@ -24,19 +24,19 @@ public struct ErrorMatcher {
 public extension ErrorMatcher {
 
     static func type(_ error: Error) -> ErrorMatcher {
-        .init(matcher: { $0.reflectedString == error.reflectedString })
+        return .init(matcher: { $0.reflectedString == error.reflectedString })
     }
 
     static func code(_ code: Int) -> ErrorMatcher {
-        .init(matcher: { $0._code == code })
+        return .init(matcher: { $0._code == code })
     }
 
     static func domain(_ domain: String) -> ErrorMatcher {
-        .init(matcher: { $0._domain == domain })
+        return .init(matcher: { $0._domain == domain })
     }
 
     @available(*, deprecated, message: "Create an extension on ErrorMatcher instead")
     static func match(_ matcher: @escaping ((Error) -> Bool)) -> ErrorMatcher {
-        .init(matcher: matcher)
+        return .init(matcher: matcher)
     }
 }
