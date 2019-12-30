@@ -117,17 +117,16 @@ class ResultErrorHandlerTests: XCTestCase {
     }
 }
 
-extension ResultErrorHandlerTests {
-    private enum HandlerError1: Error {
+private extension ResultErrorHandlerTests {
+    enum HandlerError1: Error {
         case error1
         case error2
         case error3
     }
 
-    private enum HandlerError2: Error {
+    enum HandlerError2: Error {
         case error4
     }
-
 }
 
 extension ResultErrorHandlerTests {

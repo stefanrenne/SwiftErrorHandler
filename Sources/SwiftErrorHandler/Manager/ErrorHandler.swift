@@ -17,7 +17,7 @@ open class ErrorHandler {
         self.view = errorHandlerView
     }
     
-    private var specificErrorActions = [(ErrorMatcher, ActionHandler)]()
+    private var specificErrorActions = [(matcher: ErrorMatcher, action: ActionHandler)]()
     private var alwaysActions = [ActionHandler]()
     private var defaultActions = [ActionHandler]()
     
@@ -65,7 +65,9 @@ open class ErrorHandler {
     public func handle(error: Error, onCompleted: OnErrorHandled) -> Bool {
         
         // Check if we have a handler for this error:
-        let specificErrorHandlers: [ActionHandler] = specificErrorActions.actions(for: error)
+        let specificErrorHandlers: [ActionHandler] = specificErrorActions
+            .filter({ $0.matcher.catches(error) })
+            .map({ $0.action })
         
         let actions: [ActionHandler]
         if specificErrorHandlers.count > 0 {
