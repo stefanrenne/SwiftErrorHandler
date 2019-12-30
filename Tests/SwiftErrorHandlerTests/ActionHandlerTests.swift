@@ -85,8 +85,8 @@ class ActionHandlerTests: XCTestCase {
     
 }
 
-extension ActionHandlerTests {
-    private enum SimpleError: Error {
+private extension ActionHandlerTests {
+    enum SimpleError: Error {
         case error1
     }
 }

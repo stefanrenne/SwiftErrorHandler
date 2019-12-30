@@ -8,28 +8,35 @@
 
 import Foundation
 
-public enum ErrorMatcher {
-    case type(Error)
-    case code(Int)
-    case domain(String)
-    case match((Error) -> Bool)
+public struct ErrorMatcher {
+
+    private let matcher: ((Error) -> Bool)
+
+    public init(matcher: @escaping ((Error) -> Bool)) {
+        self.matcher = matcher
+    }
+
+    public func catches(_ error: Error) -> Bool {
+        return matcher(error)
+    }
 }
 
-extension Array where Element == (ErrorMatcher, ActionHandler) {
-    func actions(for error: Error) -> [ActionHandler] {
-        return compactMap { (onError, action) -> ActionHandler? in
-            switch onError {
-            case .code(let code) where code == error._code:
-                return action
-            case .domain(let domain) where domain == error._domain:
-                return action
-            case .type(let matcher) where matcher.reflectedString == error.reflectedString:
-                return action
-            case .match(let matcher) where matcher(error):
-                return action
-            default:
-                return nil
-            }
-        }
+public extension ErrorMatcher {
+
+    static func type(_ error: Error) -> ErrorMatcher {
+        return .init(matcher: { $0.reflectedString == error.reflectedString })
+    }
+
+    static func code(_ code: Int) -> ErrorMatcher {
+        return .init(matcher: { $0._code == code })
+    }
+
+    static func domain(_ domain: String) -> ErrorMatcher {
+        return .init(matcher: { $0._domain == domain })
+    }
+
+    @available(*, deprecated, message: "Create an extension on ErrorMatcher instead")
+    static func match(_ matcher: @escaping ((Error) -> Bool)) -> ErrorMatcher {
+        return .init(matcher: matcher)
     }
 }

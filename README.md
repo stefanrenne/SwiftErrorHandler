@@ -147,23 +147,29 @@ let user: User? = result.get(onError: errorHandler)
 
 **Match on specific error type**
 
-`.on(error: .type(NetworkError.authenticate), then: .doNothing)`
+`errorHandler.on(error: .type(NetworkError.authenticate), then: .doNothing)`
 
 #### Match on NSError code
 
-`.on(error: .code(404), then: .doNothing)`
+``errorHandler.on(error: .code(404), then: .doNothing)`
 
 #### Match on NSError domain
 
-`.on(error: .domain("remote"), then: .doNothing)`
+`errorHandler.on(error: .domain("remote"), then: .doNothing)`
 
 #### Custom matching
 
 ```
-.on(error: .match({ error in 
-  ...
-  return true
-}), then: .doNothing)
+extension ErrorMatcher {
+    static func onCustomMatch() -> ErrorMatcher {
+        .init(matcher: { error in 
+            ...
+            return true 
+        })
+    }
+}
+
+.on(error: .onCustomMatch()), then: .doNothing)
 ```
 
 ### Error Handling
@@ -172,14 +178,14 @@ let user: User? = result.get(onError: errorHandler)
 
 It mainly exists to make documentation & unit tests easier to understand.
 
-`.on(error: .code(404), then: .doNothing)`
+`errorHandler.on(error: .code(404), then: .doNothing)`
 
 
 #### Present Alert
 
 The Alert is presented on the View provided in the ErrorHandler init
 
-`.on(error: .code(404), then: .present(alert: ErrorAlert))`
+`errorHandler.on(error: .code(404), then: .present(alert: ErrorAlert))`
 
 By default there are two alert types you can present:
 
@@ -197,7 +203,7 @@ Would you like to use different alerts?
 
 The only limitation is your mind.
 
-`.on(error: .code(404), then: .perform(action: CustomActionHandler)`
+`errorHandler.on(error: .code(404), then: .perform(action: CustomActionHandler)`
 
 The **CustomActionHandler** provides the `Error` and an optional `onCompleted` completionblock that needs to be executed when your custom action has been performed.
 

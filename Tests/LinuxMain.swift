@@ -2,6 +2,5 @@ import XCTest
 
 import SwiftErrorHandlerTests
 
-var tests = [XCTestCaseEntry]()
-tests += SwiftErrorHandlerTests.allTests()
+let tests: [XCTestCaseEntry] = SwiftErrorHandlerTests.allTests()
 XCTMain(tests)
