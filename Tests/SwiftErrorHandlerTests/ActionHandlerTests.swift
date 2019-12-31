@@ -34,7 +34,6 @@ class ActionHandlerTests: XCTestCase {
         XCTAssertEqual(view.lastResult?.actions.count, 1)
         XCTAssertEqual(view.lastResult?.actions[0].title, "cancel")
         XCTAssertEqual(view.lastResult?.actions[0].style, .cancel)
-        XCTAssertEqual(view.lastResult?.actions[0].isEnabled, true)
     }
     
     func testItCanHandleAConfirmableAlertAction() throws {
@@ -51,7 +50,6 @@ class ActionHandlerTests: XCTestCase {
         XCTAssertEqual(view.lastResult?.actions.count, 1)
         XCTAssertEqual(view.lastResult?.actions[0].title, "confirm")
         XCTAssertEqual(view.lastResult?.actions[0].style, .default)
-        XCTAssertEqual(view.lastResult?.actions[0].isEnabled, true)
     }
     
     func testItCanHandleARejectableAlertAction() throws {
@@ -68,10 +66,8 @@ class ActionHandlerTests: XCTestCase {
         XCTAssertEqual(view.lastResult?.actions.count, 2)
         XCTAssertEqual(view.lastResult?.actions[0].title, "YES")
         XCTAssertEqual(view.lastResult?.actions[0].style, .default)
-        XCTAssertEqual(view.lastResult?.actions[0].isEnabled, true)
         XCTAssertEqual(view.lastResult?.actions[1].title, "NO")
         XCTAssertEqual(view.lastResult?.actions[1].style, .cancel)
-        XCTAssertEqual(view.lastResult?.actions[1].isEnabled, true)
     }
 
     func testItCanHandleTheCustomAction() throws {

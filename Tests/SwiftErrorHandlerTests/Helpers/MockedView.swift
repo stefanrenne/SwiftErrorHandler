@@ -14,7 +14,7 @@ class MockedView: ErrorHandlerView {
     private let presentedAlertsGroups: DispatchGroup
     private let customHandlersGroup: DispatchGroup
     private let onCompletedGroups: DispatchGroup
-    var lastResult: UIAlertController?
+    var lastResult: AlertController?
     
     init(numberExpectedPresentedAlerts: Int = 0, numberExpectedCustomHandlers: Int = 0, numberExpectedonCompleted: Int = 0) {
         presentedAlertsGroups = DispatchGroup.enter(number: numberExpectedPresentedAlerts)
@@ -22,7 +22,7 @@ class MockedView: ErrorHandlerView {
         onCompletedGroups = DispatchGroup.enter(number: numberExpectedonCompleted)
     }
     
-    func present(alert: UIAlertController) {
+    func present(alert: AlertController) {
         lastResult = alert
         presentedAlertsGroups.leave()
     }

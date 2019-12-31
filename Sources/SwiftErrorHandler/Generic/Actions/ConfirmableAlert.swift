@@ -6,7 +6,7 @@
 //  Copyright © 2019 stefanrenne. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 public struct ConfirmableAlert: ErrorAlert {
     let title: String
@@ -21,9 +21,9 @@ public struct ConfirmableAlert: ErrorAlert {
         self.confirmAction = confirmAction
     }
     
-    public func build(for error: Error, onCompleted: OnErrorHandled) -> UIAlertController {
-        let controller = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let confirmButton = UIAlertAction(title: confirmTitle, style: .default) { _ in
+    public func build(for error: Error, onCompleted: OnErrorHandled) -> AlertController {
+        let controller = AlertController(title: title, message: message, preferredStyle: .alert)
+        let confirmButton = AlertAction(title: confirmTitle, style: .default) { _ in
             self.confirmAction?(error)
             onCompleted?()
         }

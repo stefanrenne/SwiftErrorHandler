@@ -6,14 +6,14 @@
 //  Copyright © 2019 stefanrenne. All rights reserved.
 //
 
-import UIKit
+import Foundation
 @testable import SwiftErrorHandler
 
 class MockedAlert: ErrorAlert {
     
-    func build(for error: Error, onCompleted: OnErrorHandled) -> UIAlertController {
-        let controller = UIAlertController(title: "title", message: "message", preferredStyle: .alert)
-        controller.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: nil))
+    func build(for error: Error, onCompleted: OnErrorHandled) -> AlertController {
+        let controller = AlertController(title: "title", message: "message", preferredStyle: .alert)
+        controller.addAction(AlertAction(title: "cancel", style: .cancel, handler: nil))
         return controller
     }
 }
