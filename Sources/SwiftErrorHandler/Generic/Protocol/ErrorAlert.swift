@@ -6,8 +6,8 @@
 //  Copyright © 2019 stefanrenne. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 public protocol ErrorAlert {
-    func build(for error: Error, onCompleted: OnErrorHandled) -> UIAlertController
+    func build(for error: Error, onCompleted: OnErrorHandled) -> AlertController
 }

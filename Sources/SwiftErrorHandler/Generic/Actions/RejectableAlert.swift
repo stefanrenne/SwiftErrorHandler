@@ -6,7 +6,7 @@
 //  Copyright © 2019 stefanrenne. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 public struct RejectableAlert: ErrorAlert {
     let title: String
@@ -25,14 +25,14 @@ public struct RejectableAlert: ErrorAlert {
         self.rejectAction = rejectAction
     }
     
-    public func build(for error: Error, onCompleted: OnErrorHandled) -> UIAlertController {
-        let controller = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    public func build(for error: Error, onCompleted: OnErrorHandled) -> AlertController {
+        let controller = AlertController(title: title, message: message, preferredStyle: .alert)
         
-        let confirmButton = UIAlertAction(title: confirmTitle, style: .default) { _ in
+        let confirmButton = AlertAction(title: confirmTitle, style: .default) { _ in
             self.confirmAction?(error)
             onCompleted?()
         }
-        let rejectButton = UIAlertAction(title: rejectTitle, style: .cancel) { _ in
+        let rejectButton = AlertAction(title: rejectTitle, style: .cancel) { _ in
             self.rejectAction?(error)
             onCompleted?()
         }

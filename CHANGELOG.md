@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ---
+## [5.0.4](https://github.com/stefanrenne/SwiftErrorHandler/releases/tag/5.0.4)
+
+* Platform seperation, preparation to support MacOS & Linux
+
 ## [5.0.3](https://github.com/stefanrenne/SwiftErrorHandler/releases/tag/5.0.3)
 
 * Added Swift Result extension for error handling
