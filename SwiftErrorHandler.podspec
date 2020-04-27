@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name                   = 'SwiftErrorHandler'
-  spec.version                = '5.0.3'
+  spec.version                = '5.0.4'
   spec.license                = { :type => 'Apache-2.0' }
   spec.homepage               = 'https://github.com/stefanrenne/SwiftErrorHandler'
   spec.authors                = { 'Stefan Renne' => 'info@stefanrenne.nl' }
