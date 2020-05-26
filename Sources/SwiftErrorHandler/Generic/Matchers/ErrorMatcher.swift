@@ -23,6 +23,10 @@ public struct ErrorMatcher {
 
 public extension ErrorMatcher {
 
+    static func typeWithAnyAssociatedValue(_ error: Error) -> ErrorMatcher {
+        return .init(matcher: { ($0 as NSError).isEqual(error as NSError) })
+    }
+
     static func type(_ error: Error) -> ErrorMatcher {
         return .init(matcher: { $0.reflectedString == error.reflectedString })
     }
