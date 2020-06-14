@@ -49,7 +49,12 @@ private extension ErrorMatcher {
 
     static var isError3: ErrorMatcher {
         return .init(matcher: { error in
-            guard let testError = error as? ErrorMatcherTests.MatcherError1, testError == .error3 else { return true }
+            guard
+                let testError = error as? ErrorMatcherTests.MatcherError1,
+                testError == .error3
+            else {
+                return false
+            }
             return true
         })
     }
